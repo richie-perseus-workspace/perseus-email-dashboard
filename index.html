@@ -4,380 +4,533 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Perseus — Email Sequence Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --purple:      #6938ef;
-      --purple-dim:  #4f28c7;
-      --purple-glow: rgba(105,56,239,0.18);
-      --bg:          #0d0d0f;
-      --bg2:         #131318;
-      --bg3:         #1a1a24;
-      --border:      rgba(255,255,255,0.07);
-      --text:        #e8e8f0;
-      --muted:       #7c7c96;
-      --green:       #22c55e;
-      --orange:      #f97316;
-      --red:         #ef4444;
-      --yellow:      #eab308;
-      --blue:        #3b82f6;
+      --purple:       #6938ef;
+      --purple-deep:  #451C46;
+      --purple-bg:    rgba(105,56,239,0.07);
+      --purple-border:rgba(105,56,239,0.18);
+      --text:         #111111;
+      --muted:        #666666;
+      --light:        #f4f4f6;
+      --border:       rgba(0,0,0,0.08);
+      --card-shadow:  0 1px 3px rgba(0,0,0,0.04), 0 6px 28px rgba(0,0,0,0.06);
+      --green:        #16a34a;
+      --green-bg:     rgba(22,163,74,0.08);
+      --orange:       #ea580c;
+      --orange-bg:    rgba(234,88,12,0.08);
+      --red:          #dc2626;
+      --red-bg:       rgba(220,38,38,0.08);
+      --yellow:       #ca8a04;
+      --yellow-bg:    rgba(202,138,4,0.08);
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      background: var(--bg);
+      background: #f8f8fa;
       color: var(--text);
-      font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+      font-family: 'Inter Tight', sans-serif;
       font-size: 14px;
       min-height: 100vh;
     }
 
     /* ── Top Bar ── */
     .topbar {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 16px 28px; border-bottom: 1px solid var(--border);
-      background: var(--bg2); position: sticky; top: 0; z-index: 200;
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 200;
     }
-    .logo { font-size: 17px; font-weight: 700; letter-spacing: -0.5px; color: #fff; }
-    .logo span { color: var(--purple); }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.03em;
+    }
+    .logo-dot {
+      width: 26px; height: 26px;
+      background: var(--purple);
+      border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 13px; font-weight: 800;
+    }
     .topbar-right { display: flex; align-items: center; gap: 14px; }
     .last-updated { color: var(--muted); font-size: 12px; }
     .refresh-btn {
       background: var(--purple); border: none; color: #fff;
-      padding: 7px 16px; border-radius: 6px; cursor: pointer;
-      font-size: 13px; font-weight: 600; transition: background 0.2s;
+      padding: 7px 16px; border-radius: 100px; cursor: pointer;
+      font-size: 13px; font-weight: 700; letter-spacing: -0.02em;
+      transition: background 0.18s;
     }
-    .refresh-btn:hover { background: var(--purple-dim); }
+    .refresh-btn:hover { background: var(--purple-deep); }
 
     /* ── Date Filter Bar ── */
     .date-bar {
-      background: var(--bg2); border-bottom: 1px solid var(--border);
-      padding: 10px 28px; display: flex; align-items: center; gap: 10px;
-      flex-wrap: wrap; position: sticky; top: 57px; z-index: 190;
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+      height: 46px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      position: sticky;
+      top: 56px;
+      z-index: 190;
     }
-    .date-bar-label { color: var(--muted); font-size: 12px; font-weight: 600;
-      text-transform: uppercase; letter-spacing: 0.6px; margin-right: 4px; }
+    .date-bar-label {
+      color: var(--muted); font-size: 11px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.06em; margin-right: 6px;
+    }
     .date-btn {
-      background: var(--bg3); border: 1px solid var(--border);
-      color: var(--muted); padding: 5px 13px; border-radius: 5px;
-      cursor: pointer; font-size: 12px; font-weight: 600;
+      background: transparent;
+      border: 1.5px solid var(--border);
+      color: var(--muted);
+      padding: 4px 13px;
+      border-radius: 100px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: 'Inter Tight', sans-serif;
       transition: all 0.15s;
     }
-    .date-btn:hover { border-color: var(--purple); color: var(--text); }
+    .date-btn:hover { border-color: var(--purple); color: var(--purple); }
     .date-btn.active {
-      background: var(--purple-glow); border-color: var(--purple);
-      color: var(--purple);
+      background: var(--purple);
+      border-color: var(--purple);
+      color: #fff;
     }
-    .custom-dates { display: none; align-items: center; gap: 8px; }
+    .custom-dates { display: none; align-items: center; gap: 8px; margin-left: 4px; }
     .custom-dates.show { display: flex; }
     .date-input {
-      background: var(--bg3); border: 1px solid var(--border);
-      color: var(--text); padding: 5px 9px; border-radius: 5px;
-      font-size: 12px; outline: none;
+      background: #fff; border: 1.5px solid var(--border);
+      color: var(--text); padding: 4px 9px; border-radius: 6px;
+      font-size: 12px; font-family: 'Inter Tight', sans-serif; outline: none;
     }
     .date-input:focus { border-color: var(--purple); }
     .date-apply {
       background: var(--purple); border: none; color: #fff;
-      padding: 5px 12px; border-radius: 5px; cursor: pointer;
-      font-size: 12px; font-weight: 600;
+      padding: 5px 12px; border-radius: 100px; cursor: pointer;
+      font-size: 12px; font-weight: 700; font-family: 'Inter Tight', sans-serif;
     }
+    .range-label { color: var(--muted); font-size: 12px; margin-left: 6px; }
 
     /* ── Layout ── */
-    .main { padding: 24px 28px; max-width: 1500px; margin: 0 auto; }
+    .main { padding: 24px 32px; max-width: 1500px; margin: 0 auto; }
 
-    /* ── Section Headers ── */
-    .section-header {
-      display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
-    }
-    .section-header h2 { font-size: 14px; font-weight: 600; color: #fff; }
-    .badge {
-      background: var(--purple-glow); border: 1px solid rgba(105,56,239,0.3);
-      color: var(--purple); padding: 2px 8px; border-radius: 20px;
-      font-size: 11px; font-weight: 700;
+    /* ── Card base ── */
+    .card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: var(--card-shadow);
     }
 
     /* ── KPI Grid ── */
     .kpi-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
-      gap: 14px; margin-bottom: 28px;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
     }
     .kpi {
-      background: var(--bg2); border: 1px solid var(--border);
-      border-radius: 10px; padding: 18px 16px; cursor: default;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: var(--card-shadow);
+      padding: 18px 16px;
+      position: relative;
     }
-    .kpi-label { color: var(--muted); font-size: 10px; text-transform: uppercase;
-      letter-spacing: 0.8px; margin-bottom: 8px; }
-    .kpi-value { font-size: 26px; font-weight: 700; color: #fff; line-height: 1; }
+    .kpi-num {
+      position: absolute;
+      top: 12px; right: 14px;
+      font-size: 10px;
+      font-weight: 800;
+      color: var(--purple);
+      background: var(--purple-bg);
+      border-radius: 4px;
+      padding: 1px 5px;
+      letter-spacing: 0.04em;
+    }
+    .kpi-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 10px;
+    }
+    .kpi-value {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--text);
+      line-height: 1;
+      letter-spacing: -0.03em;
+    }
+    .kpi-value.purple { color: var(--purple); }
     .kpi-value.green  { color: var(--green); }
     .kpi-value.orange { color: var(--orange); }
-    .kpi-value.purple { color: var(--purple); }
-    .kpi-value.red    { color: var(--red); }
-    .kpi-sub { color: var(--muted); font-size: 11px; margin-top: 6px; }
-
-    /* ── Two-col layout ── */
-    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
-    @media (max-width: 960px) { .two-col { grid-template-columns: 1fr; } }
-
-    /* ── Panel ── */
-    .panel {
-      background: var(--bg2); border: 1px solid var(--border);
-      border-radius: 10px; overflow: hidden;
+    .kpi-sub {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 5px;
     }
-    .panel-header {
-      padding: 12px 18px; border-bottom: 1px solid var(--border);
+
+    /* ── Section header ── */
+    .section-header {
       display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 14px;
     }
-    .panel-title { font-weight: 600; font-size: 13px; color: #fff; }
-    .panel-body { overflow-y: auto; max-height: 340px; }
+    .section-title {
+      font-size: 14px; font-weight: 700; color: var(--text);
+      letter-spacing: -0.02em;
+    }
+    .section-badge {
+      background: var(--purple-bg);
+      border: 1px solid var(--purple-border);
+      color: var(--purple);
+      font-size: 11px; font-weight: 700;
+      padding: 2px 9px; border-radius: 100px;
+    }
 
     /* ── Warm Leads ── */
-    .warm-panel {
-      background: var(--bg2); border: 1px solid rgba(249,115,22,0.25);
-      border-radius: 10px; overflow: hidden; margin-bottom: 24px;
+    .warm-card {
+      background: #fff;
+      border: 1.5px solid rgba(234,88,12,0.2);
+      border-radius: 12px;
+      box-shadow: var(--card-shadow);
+      overflow: hidden;
+      margin-bottom: 24px;
     }
     .warm-header {
-      padding: 12px 18px; border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: space-between;
-      cursor: pointer; user-select: none;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      user-select: none;
     }
-    .warm-title { display: flex; align-items: center; gap: 10px;
-      font-weight: 600; font-size: 13px; color: var(--orange); }
+    .warm-title {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 14px; font-weight: 700; color: var(--orange);
+      letter-spacing: -0.02em;
+    }
     .fire-dot {
-      width: 8px; height: 8px; background: var(--orange);
-      border-radius: 50%; animation: pulse 1.5s infinite;
+      width: 8px; height: 8px;
+      background: var(--orange);
+      border-radius: 50%;
+      animation: pulse 1.5s infinite;
     }
     @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50%       { opacity: 0.5; transform: scale(1.4); }
+      0%,100% { opacity:1; transform:scale(1); }
+      50%      { opacity:0.4; transform:scale(1.4); }
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .chevron { color: var(--muted); font-size: 14px; transition: transform 0.2s; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .chevron { color: var(--muted); font-size: 12px; transition: transform 0.2s; }
     .chevron.open { transform: rotate(180deg); }
     .warm-body { display: none; }
     .warm-body.open { display: block; }
     .warm-item {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 11px 18px; border-bottom: 1px solid var(--border); gap: 12px;
+      display: flex; align-items: center; gap: 14px;
+      padding: 12px 20px;
+      border-bottom: 1px solid var(--border);
     }
     .warm-item:last-child { border-bottom: none; }
-    .warm-info { flex: 1; min-width: 0; }
-    .warm-name { font-weight: 600; color: #fff; font-size: 13px; }
-    .warm-email { color: var(--muted); font-size: 11px; margin-top: 2px; }
-    .warm-trigger {
-      font-size: 10px; padding: 3px 8px; border-radius: 4px;
-      font-weight: 600; white-space: nowrap;
+    .warm-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--orange-bg);
+      border: 1.5px solid rgba(234,88,12,0.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; flex-shrink: 0;
     }
-    .trigger-lp    { background: rgba(105,56,239,0.15); color: #a78bfa; }
-    .trigger-cta   { background: rgba(249,115,22,0.15); color: var(--orange); }
-    .trigger-video { background: rgba(34,197,94,0.12);  color: var(--green); }
-    .trigger-open  { background: rgba(234,179,8,0.12);  color: var(--yellow); }
-    .warm-meta { color: var(--muted); font-size: 11px; text-align: right; white-space: nowrap; }
+    .warm-info { flex: 1; min-width: 0; }
+    .warm-name { font-size: 13px; font-weight: 700; color: var(--text); letter-spacing: -0.02em; }
+    .warm-email { font-size: 12px; color: var(--muted); margin-top: 1px; }
+    .warm-trigger {
+      font-size: 11px; padding: 3px 9px; border-radius: 100px;
+      font-weight: 700; white-space: nowrap;
+    }
+    .trigger-lp    { background: var(--purple-bg); color: var(--purple); }
+    .trigger-cta   { background: var(--orange-bg); color: var(--orange); }
+    .trigger-video { background: var(--green-bg);  color: var(--green); }
+    .trigger-open  { background: var(--yellow-bg); color: var(--yellow); }
+    .warm-meta { font-size: 11px; color: var(--muted); text-align: right; white-space: nowrap; }
     .open-profile-btn {
       display: inline-flex; align-items: center; gap: 4px;
-      background: transparent; border: 1px solid rgba(105,56,239,0.4);
-      color: var(--purple); padding: 4px 10px; border-radius: 5px;
-      text-decoration: none; font-size: 11px; font-weight: 600;
-      transition: background 0.2s; white-space: nowrap;
+      background: transparent;
+      border: 1.5px solid rgba(0,0,0,0.12);
+      color: var(--text);
+      padding: 5px 12px; border-radius: 100px;
+      text-decoration: none; font-size: 12px; font-weight: 600;
+      transition: border-color 0.15s, color 0.15s; white-space: nowrap;
     }
-    .open-profile-btn:hover { background: var(--purple-glow); }
-    .no-warm { padding: 20px; text-align: center; color: var(--muted); font-size: 12px; }
+    .open-profile-btn:hover { border-color: var(--purple); color: var(--purple); }
+    .no-data {
+      padding: 24px 20px; text-align: center;
+      color: var(--muted); font-size: 13px;
+    }
 
-    /* ── Booked Panel ── */
-    .booked-filter { display: flex; gap: 6px; }
-    .booked-btn {
-      background: var(--bg3); border: 1px solid var(--border);
-      color: var(--muted); padding: 3px 10px; border-radius: 4px;
-      cursor: pointer; font-size: 11px; font-weight: 600; transition: all 0.15s;
+    /* ── Two col ── */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+    @media (max-width: 960px) { .two-col { grid-template-columns: 1fr; } }
+
+    /* ── Panel ── */
+    .panel-header {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
     }
-    .booked-btn:hover { border-color: var(--green); color: var(--text); }
-    .booked-btn.active { background: rgba(34,197,94,0.12); border-color: var(--green); color: var(--green); }
+    .panel-title { font-size: 13px; font-weight: 700; color: var(--text); letter-spacing: -0.02em; }
+    .panel-body { overflow-y: auto; max-height: 320px; }
+
+    /* ── Calls Booked ── */
+    .booked-filter { display: flex; gap: 4px; }
+    .booked-btn {
+      background: transparent; border: 1.5px solid var(--border);
+      color: var(--muted); padding: 3px 10px; border-radius: 100px;
+      cursor: pointer; font-size: 11px; font-weight: 600;
+      font-family: 'Inter Tight', sans-serif; transition: all 0.15s;
+    }
+    .booked-btn:hover { border-color: var(--green); color: var(--green); }
+    .booked-btn.active { background: var(--green); border-color: var(--green); color: #fff; }
+
     .booked-item {
       display: flex; align-items: center; gap: 12px;
-      padding: 10px 18px; border-bottom: 1px solid var(--border);
+      padding: 11px 20px; border-bottom: 1px solid var(--border);
     }
     .booked-item:last-child { border-bottom: none; }
     .booked-avatar {
-      width: 32px; height: 32px; border-radius: 50%;
-      background: rgba(34,197,94,0.15); border: 1px solid var(--green);
+      width: 34px; height: 34px; border-radius: 50%;
+      background: var(--green-bg);
+      border: 1.5px solid rgba(22,163,74,0.2);
       display: flex; align-items: center; justify-content: center;
-      font-size: 14px; flex-shrink: 0;
+      font-size: 15px; flex-shrink: 0;
     }
     .booked-info { flex: 1; min-width: 0; }
-    .booked-name { font-weight: 600; color: #fff; font-size: 13px; }
-    .booked-email { color: var(--muted); font-size: 11px; }
-    .booked-meta { color: var(--muted); font-size: 11px; text-align: right; white-space: nowrap; }
-    .booked-rep { font-size: 10px; padding: 2px 7px; border-radius: 4px; font-weight: 700; }
-    .rep-richie  { background: rgba(105,56,239,0.15); color: #a78bfa; }
-    .rep-nathan  { background: rgba(59,130,246,0.15); color: var(--blue); }
+    .booked-name { font-size: 13px; font-weight: 700; color: var(--text); }
+    .booked-email { font-size: 11px; color: var(--muted); margin-top: 1px; }
+    .booked-meta { text-align: right; white-space: nowrap; }
+    .booked-rep {
+      font-size: 10px; font-weight: 700; padding: 2px 8px;
+      border-radius: 100px;
+    }
+    .rep-richie  { background: var(--purple-bg); color: var(--purple); }
+    .rep-nathan  { background: rgba(59,130,246,0.08); color: #2563eb; }
+    .booked-time { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+    /* ── Events ── */
+    .event-type-filter {
+      background: #fff; border: 1.5px solid var(--border);
+      border-radius: 6px; color: var(--text); padding: 4px 8px;
+      font-size: 11px; font-family: 'Inter Tight', sans-serif; outline: none; cursor: pointer;
+    }
+    .event-type-filter:focus { border-color: var(--purple); }
+    .log-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 20px; border-bottom: 1px solid var(--border); font-size: 12px;
+    }
+    .log-item:last-child { border-bottom: none; }
+    .log-time { color: var(--muted); font-size: 11px; white-space: nowrap; min-width: 110px; }
+    .log-type {
+      padding: 2px 8px; border-radius: 100px;
+      font-size: 10px; font-weight: 700; white-space: nowrap;
+    }
+    .type-sent    { background: var(--purple-bg); color: var(--purple); }
+    .type-open    { background: var(--yellow-bg); color: var(--yellow); }
+    .type-click   { background: var(--green-bg);  color: var(--green); }
+    .type-lp      { background: var(--purple-bg); color: var(--purple); }
+    .type-cta     { background: var(--orange-bg); color: var(--orange); }
+    .type-video   { background: var(--orange-bg); color: var(--orange); }
+    .type-trigger { background: var(--red-bg);    color: var(--red); }
+    .type-booked  { background: var(--green-bg);  color: var(--green); }
+    .log-email { font-size: 12px; font-weight: 600; color: var(--text); flex-shrink: 0; }
+    .log-detail { color: var(--muted); flex: 1; font-size: 11px; }
 
     /* ── Contact Table ── */
     .table-wrap {
-      background: var(--bg2); border: 1px solid var(--border);
-      border-radius: 10px; overflow: hidden; margin-bottom: 24px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: var(--card-shadow);
+      overflow: hidden;
+      margin-bottom: 24px;
     }
     .table-controls {
-      padding: 12px 18px; border-bottom: 1px solid var(--border);
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
       display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
     }
     .search-input {
-      background: var(--bg3); border: 1px solid var(--border);
-      border-radius: 6px; color: var(--text); padding: 6px 11px;
-      font-size: 13px; width: 200px; outline: none;
+      background: #f8f8fa;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      padding: 7px 12px;
+      font-size: 13px;
+      font-family: 'Inter Tight', sans-serif;
+      width: 220px; outline: none;
     }
-    .search-input:focus { border-color: var(--purple); }
+    .search-input:focus { border-color: var(--purple); background: #fff; }
     .filter-select {
-      background: var(--bg3); border: 1px solid var(--border);
-      border-radius: 6px; color: var(--text); padding: 6px 9px;
-      font-size: 12px; outline: none; cursor: pointer;
+      background: #f8f8fa;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      padding: 7px 10px;
+      font-size: 12px;
+      font-family: 'Inter Tight', sans-serif;
+      outline: none; cursor: pointer;
     }
     .filter-select:focus { border-color: var(--purple); }
     .ml-auto { margin-left: auto; }
+    .table-stats { font-size: 12px; color: var(--muted); }
 
     table { width: 100%; border-collapse: collapse; }
     thead th {
-      padding: 9px 14px; text-align: left; font-size: 10px;
-      text-transform: uppercase; letter-spacing: 0.7px; color: var(--muted);
+      padding: 10px 16px; text-align: left;
+      font-size: 10px; text-transform: uppercase;
+      letter-spacing: 0.07em; color: var(--muted); font-weight: 700;
       border-bottom: 1px solid var(--border); white-space: nowrap;
+      background: #fafafa;
     }
     tbody tr.contact-row {
       border-bottom: 1px solid var(--border);
-      cursor: pointer; transition: background 0.12s;
+      cursor: pointer; transition: background 0.1s;
     }
-    tbody tr.contact-row:hover { background: rgba(255,255,255,0.03); }
+    tbody tr.contact-row:hover { background: #fafafa; }
     tbody tr.expand-row { border-bottom: 1px solid var(--border); }
     tbody tr.expand-row td { padding: 0; }
-    .expand-panel {
-      background: var(--bg3); padding: 0;
-      display: none; border-top: 1px solid var(--border);
-    }
+    .expand-panel { background: #f8f8fa; display: none; }
     .expand-panel.open { display: block; }
-    .expand-inner { padding: 16px 18px; }
-    td {
-      padding: 10px 14px; font-size: 12px; vertical-align: middle;
-    }
-    .email-cell { font-weight: 500; color: #fff; }
-    .contact-name { color: var(--muted); font-size: 11px; margin-top: 2px; }
+    .expand-inner { padding: 18px 20px; }
+    td { padding: 11px 16px; font-size: 13px; vertical-align: middle; }
+
+    .email-cell { font-weight: 700; color: var(--text); letter-spacing: -0.01em; }
+    .contact-name { font-size: 11px; color: var(--muted); margin-top: 2px; font-weight: 500; }
 
     .seq-badge {
-      display: inline-block; padding: 2px 7px; border-radius: 4px;
-      font-size: 10px; font-weight: 700;
+      display: inline-block; padding: 3px 9px;
+      border-radius: 100px; font-size: 11px; font-weight: 700;
     }
-    .pp1 { background: rgba(105,56,239,0.15); color: #a78bfa; }
-    .pp2 { background: rgba(34,197,94,0.12);  color: var(--green); }
-    .pp3 { background: rgba(249,115,22,0.12); color: var(--orange); }
-    .pp4 { background: rgba(234,179,8,0.12);  color: var(--yellow); }
+    .pp1 { background: var(--purple-bg); color: var(--purple); }
+    .pp2 { background: var(--green-bg);  color: var(--green); }
+    .pp3 { background: var(--orange-bg); color: var(--orange); }
+    .pp4 { background: var(--yellow-bg); color: var(--yellow); }
 
+    .status-chip {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 9px; border-radius: 100px;
+      font-size: 11px; font-weight: 700;
+    }
     .status-dot {
-      display: inline-block; width: 7px; height: 7px;
-      border-radius: 50%; margin-right: 5px;
+      width: 6px; height: 6px; border-radius: 50%;
+    }
+    .chip-active   { background: var(--green-bg);  color: var(--green); }
+    .chip-call     { background: var(--orange-bg); color: var(--orange); animation: pulse-chip 1.5s infinite; }
+    .chip-rebound  { background: var(--yellow-bg); color: var(--yellow); }
+    .chip-cold     { background: #f0f0f4; color: var(--muted); }
+    .chip-complete { background: var(--green-bg);  color: var(--green); }
+    .chip-removed  { background: var(--red-bg);    color: var(--red); }
+    @keyframes pulse-chip {
+      0%,100% { opacity:1; } 50% { opacity:0.6; }
     }
     .dot-active   { background: var(--green); }
+    .dot-call     { background: var(--orange); }
     .dot-rebound  { background: var(--yellow); }
-    .dot-call     { background: var(--orange); animation: pulse 1.5s infinite; }
-    .dot-cold     { background: var(--muted); }
-    .dot-complete { background: #4ade80; }
+    .dot-cold     { background: #bbb; }
+    .dot-complete { background: var(--green); }
     .dot-removed  { background: var(--red); }
 
     .stat-pills { display: flex; gap: 4px; flex-wrap: wrap; }
     .pill {
-      font-size: 10px; padding: 2px 6px; border-radius: 3px;
-      font-weight: 600; white-space: nowrap;
+      font-size: 11px; padding: 2px 8px;
+      border-radius: 100px; font-weight: 600; white-space: nowrap;
     }
-    .pill-opens  { background: rgba(234,179,8,0.12);  color: var(--yellow); }
-    .pill-clicks { background: rgba(105,56,239,0.15); color: #a78bfa; }
-    .pill-lp     { background: rgba(34,197,94,0.12);  color: var(--green); }
-    .pill-video  { background: rgba(249,115,22,0.12); color: var(--orange); }
-    .pill-rebound { background: rgba(239,68,68,0.12); color: var(--red); }
+    .pill-opens  { background: var(--yellow-bg); color: var(--yellow); }
+    .pill-clicks { background: var(--purple-bg); color: var(--purple); }
+    .pill-lp     { background: var(--green-bg);  color: var(--green); }
+    .pill-video  { background: var(--orange-bg); color: var(--orange); }
+    .pill-rebound{ background: var(--red-bg);    color: var(--red); }
 
     .profile-link {
-      color: var(--purple); text-decoration: none; font-size: 11px;
-      font-weight: 600; padding: 3px 7px; border: 1px solid rgba(105,56,239,0.3);
-      border-radius: 4px; transition: background 0.2s; white-space: nowrap;
+      display: inline-flex; align-items: center; gap: 4px;
+      color: var(--purple); text-decoration: none;
+      font-size: 12px; font-weight: 700;
+      padding: 4px 10px; border-radius: 100px;
+      border: 1.5px solid var(--purple-border);
+      transition: background 0.15s;
     }
-    .profile-link:hover { background: var(--purple-glow); }
-
+    .profile-link:hover { background: var(--purple-bg); }
     .expand-chevron { color: var(--muted); font-size: 11px; transition: transform 0.2s; }
     .expand-chevron.open { transform: rotate(180deg); }
 
-    /* ── Expand Panel — Contact Stats ── */
+    /* ── Expand panel ── */
     .contact-stats {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-      gap: 10px; margin-bottom: 14px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+      gap: 10px; margin-bottom: 16px;
     }
     .c-stat {
-      background: var(--bg2); border: 1px solid var(--border);
-      border-radius: 7px; padding: 12px 14px;
+      background: #fff; border: 1px solid var(--border);
+      border-radius: 10px; padding: 13px 14px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
     }
-    .c-stat-label { color: var(--muted); font-size: 10px; text-transform: uppercase;
-      letter-spacing: 0.6px; margin-bottom: 5px; }
-    .c-stat-val { font-size: 20px; font-weight: 700; color: #fff; }
+    .c-stat-label {
+      font-size: 10px; font-weight: 700; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px;
+    }
+    .c-stat-val {
+      font-size: 22px; font-weight: 800; color: var(--text);
+      letter-spacing: -0.03em;
+    }
     .c-stat-val.yellow { color: var(--yellow); }
-    .c-stat-val.purple { color: #a78bfa; }
+    .c-stat-val.purple { color: var(--purple); }
     .c-stat-val.green  { color: var(--green); }
     .c-stat-val.orange { color: var(--orange); }
     .c-stat-val.red    { color: var(--red); }
 
-    /* ── Contact Timeline ── */
-    .timeline-title { font-size: 11px; font-weight: 600; color: var(--muted);
-      text-transform: uppercase; letter-spacing: 0.7px; margin-bottom: 8px; }
-    .timeline-empty { color: var(--muted); font-size: 12px; }
+    .timeline-title {
+      font-size: 11px; font-weight: 700; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 10px;
+    }
     .tl-item {
       display: flex; align-items: flex-start; gap: 10px;
-      padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+      padding: 7px 0; border-bottom: 1px solid var(--border);
     }
     .tl-item:last-child { border-bottom: none; }
-    .tl-dot {
-      width: 8px; height: 8px; border-radius: 50%; margin-top: 3px;
-      flex-shrink: 0;
-    }
     .tl-time { color: var(--muted); font-size: 11px; white-space: nowrap; width: 120px; flex-shrink: 0; }
-    .tl-type { font-size: 10px; padding: 1px 6px; border-radius: 3px;
+    .tl-type { font-size: 10px; padding: 2px 8px; border-radius: 100px;
       font-weight: 700; white-space: nowrap; flex-shrink: 0; }
     .tl-detail { color: var(--muted); font-size: 11px; flex: 1; }
 
-    /* ── Event Log ── */
-    .event-log {
-      background: var(--bg2); border: 1px solid var(--border);
-      border-radius: 10px; overflow: hidden; margin-bottom: 24px;
-    }
-    .log-header {
-      padding: 12px 18px; border-bottom: 1px solid var(--border);
-      font-weight: 600; font-size: 13px;
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .log-controls { display: flex; align-items: center; gap: 10px; }
-    .log-item {
-      display: flex; align-items: center; gap: 12px;
-      padding: 9px 18px; border-bottom: 1px solid var(--border); font-size: 11px;
-    }
-    .log-item:last-child { border-bottom: none; }
-    .log-time { color: var(--muted); white-space: nowrap; min-width: 130px; }
-    .log-type {
-      padding: 2px 6px; border-radius: 4px; font-weight: 700;
-      font-size: 10px; white-space: nowrap;
-    }
-    .type-sent    { background: rgba(105,56,239,0.15); color: #a78bfa; }
-    .type-open    { background: rgba(234,179,8,0.12);  color: var(--yellow); }
-    .type-click   { background: rgba(34,197,94,0.12);  color: var(--green); }
-    .type-lp      { background: rgba(34,197,94,0.12);  color: var(--green); }
-    .type-cta     { background: rgba(249,115,22,0.12); color: var(--orange); }
-    .type-video   { background: rgba(249,115,22,0.12); color: var(--orange); }
-    .type-trigger { background: rgba(239,68,68,0.12);  color: var(--red); }
-    .type-booked  { background: rgba(34,197,94,0.15);  color: var(--green); }
-    .log-email { color: #fff; font-weight: 500; flex-shrink: 0; }
-    .log-detail { color: var(--muted); flex: 1; }
-
     /* ── Loading ── */
-    .loading { padding: 32px; text-align: center; color: var(--muted); }
+    .loading { padding: 36px; text-align: center; color: var(--muted); }
     .spinner {
-      width: 22px; height: 22px; border: 2px solid var(--border);
-      border-top-color: var(--purple); border-radius: 50%;
-      animation: spin 0.7s linear infinite; margin: 0 auto 10px;
+      width: 22px; height: 22px;
+      border: 2px solid rgba(0,0,0,0.08);
+      border-top-color: var(--purple);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin: 0 auto 10px;
     }
 
-    /* ── Responsive ── */
+    /* ── Divider ── */
+    .section-gap { margin-bottom: 24px; }
+
     @media (max-width: 768px) {
-      .main { padding: 14px; }
-      .topbar, .date-bar { padding: 12px 14px; }
+      .main { padding: 16px; }
+      .topbar, .date-bar { padding: 0 16px; }
       .kpi-grid { grid-template-columns: repeat(2, 1fr); }
       .search-input { width: 100%; }
     }
@@ -387,7 +540,10 @@
 
 <!-- Top Bar -->
 <div class="topbar">
-  <div class="logo"><span>Perseus</span> &nbsp;Email Dashboard</div>
+  <div class="logo">
+    <div class="logo-dot">P</div>
+    Perseus Email Dashboard
+  </div>
   <div class="topbar-right">
     <span class="last-updated" id="lastUpdated">Not loaded</span>
     <button class="refresh-btn" onclick="loadAll()">↻ Refresh</button>
@@ -396,106 +552,66 @@
 
 <!-- Date Filter Bar -->
 <div class="date-bar">
-  <span class="date-bar-label">Range:</span>
-  <button class="date-btn" onclick="setRange('today')">Today</button>
-  <button class="date-btn" onclick="setRange('yesterday')">Yesterday</button>
-  <button class="date-btn active" onclick="setRange('7d')">7 Days</button>
-  <button class="date-btn" onclick="setRange('30d')">30 Days</button>
-  <button class="date-btn" onclick="setRange('all')">All Time</button>
-  <button class="date-btn" onclick="setRange('custom')">Custom</button>
+  <span class="date-bar-label">Range</span>
+  <button class="date-btn" onclick="setRange('today',event)">Today</button>
+  <button class="date-btn" onclick="setRange('yesterday',event)">Yesterday</button>
+  <button class="date-btn active" onclick="setRange('7d',event)">7 Days</button>
+  <button class="date-btn" onclick="setRange('30d',event)">30 Days</button>
+  <button class="date-btn" onclick="setRange('all',event)">All Time</button>
+  <button class="date-btn" onclick="setRange('custom',event)">Custom</button>
   <div class="custom-dates" id="customDates">
     <input type="date" class="date-input" id="dateFrom" />
     <span style="color:var(--muted)">→</span>
     <input type="date" class="date-input" id="dateTo" />
     <button class="date-apply" onclick="applyCustom()">Apply</button>
   </div>
-  <span id="rangeLabel" style="color:var(--muted);font-size:12px;margin-left:6px;"></span>
+  <span class="range-label" id="rangeLabel"></span>
 </div>
 
 <div class="main">
 
   <!-- KPI Grid -->
-  <div class="kpi-grid" id="kpiGrid">
-    <div class="kpi">
-      <div class="kpi-label">Active Contacts</div>
-      <div class="kpi-value purple" id="kpiActive">—</div>
-    </div>
-    <div class="kpi">
-      <div class="kpi-label">Emails Sent</div>
-      <div class="kpi-value" id="kpiSent">—</div>
-      <div class="kpi-sub" id="kpiSentSub"></div>
-    </div>
-    <div class="kpi">
-      <div class="kpi-label">Open Rate</div>
-      <div class="kpi-value green" id="kpiOpenRate">—</div>
-      <div class="kpi-sub" id="kpiOpenSub"></div>
-    </div>
-    <div class="kpi">
-      <div class="kpi-label">Click Rate</div>
-      <div class="kpi-value green" id="kpiClickRate">—</div>
-      <div class="kpi-sub" id="kpiClickSub"></div>
-    </div>
-    <div class="kpi">
-      <div class="kpi-label">LP Visits</div>
-      <div class="kpi-value purple" id="kpiLp">—</div>
-    </div>
-    <div class="kpi">
-      <div class="kpi-label">Video Plays</div>
-      <div class="kpi-value orange" id="kpiVideo">—</div>
-    </div>
-    <div class="kpi">
-      <div class="kpi-label">Warm Leads</div>
-      <div class="kpi-value orange" id="kpiWarm">—</div>
-    </div>
-    <div class="kpi">
-      <div class="kpi-label">Calls Booked</div>
-      <div class="kpi-value green" id="kpiBooked">—</div>
-    </div>
-    <div class="kpi">
-      <div class="kpi-label">Rebound Sent</div>
-      <div class="kpi-value" id="kpiRebound">—</div>
-    </div>
-    <div class="kpi">
-      <div class="kpi-label">Cold Nurture</div>
-      <div class="kpi-value" id="kpiCold">—</div>
-    </div>
-    <div class="kpi">
-      <div class="kpi-label">Completed</div>
-      <div class="kpi-value" id="kpiComplete">—</div>
-    </div>
-    <div class="kpi">
-      <div class="kpi-label">Total Contacts</div>
-      <div class="kpi-value" id="kpiTotal">—</div>
-    </div>
+  <div class="kpi-grid">
+    <div class="kpi"><span class="kpi-num">1</span><div class="kpi-label">Active Contacts</div><div class="kpi-value purple" id="kpiActive">—</div></div>
+    <div class="kpi"><span class="kpi-num">2</span><div class="kpi-label">Emails Sent</div><div class="kpi-value" id="kpiSent">—</div><div class="kpi-sub" id="kpiSentSub"></div></div>
+    <div class="kpi"><span class="kpi-num">3</span><div class="kpi-label">Open Rate</div><div class="kpi-value green" id="kpiOpenRate">—</div><div class="kpi-sub" id="kpiOpenSub"></div></div>
+    <div class="kpi"><span class="kpi-num">4</span><div class="kpi-label">Click Rate</div><div class="kpi-value green" id="kpiClickRate">—</div><div class="kpi-sub" id="kpiClickSub"></div></div>
+    <div class="kpi"><span class="kpi-num">5</span><div class="kpi-label">LP Visits</div><div class="kpi-value purple" id="kpiLp">—</div></div>
+    <div class="kpi"><span class="kpi-num">6</span><div class="kpi-label">Video Plays</div><div class="kpi-value orange" id="kpiVideo">—</div></div>
+    <div class="kpi"><span class="kpi-num">7</span><div class="kpi-label">Warm Leads</div><div class="kpi-value orange" id="kpiWarm">—</div></div>
+    <div class="kpi"><span class="kpi-num">8</span><div class="kpi-label">Calls Booked</div><div class="kpi-value green" id="kpiBooked">—</div></div>
+    <div class="kpi"><span class="kpi-num">9</span><div class="kpi-label">Rebound Sent</div><div class="kpi-value" id="kpiRebound">—</div></div>
+    <div class="kpi"><span class="kpi-num">10</span><div class="kpi-label">Cold Nurture</div><div class="kpi-value" id="kpiCold">—</div></div>
+    <div class="kpi"><span class="kpi-num">11</span><div class="kpi-label">Completed</div><div class="kpi-value" id="kpiComplete">—</div></div>
+    <div class="kpi"><span class="kpi-num">12</span><div class="kpi-label">Total Contacts</div><div class="kpi-value" id="kpiTotal">—</div></div>
   </div>
 
   <!-- Warm Leads -->
-  <div class="warm-panel">
+  <div class="warm-card section-gap">
     <div class="warm-header" onclick="toggleWarm()">
       <div class="warm-title">
         <div class="fire-dot"></div>
         🔥 Warm Leads — Call Now
-        <span class="badge" id="warmCount">0</span>
+        <span class="section-badge" id="warmCount">0</span>
       </div>
       <span class="chevron" id="warmChevron">▼</span>
     </div>
     <div class="warm-body" id="warmBody">
-      <div class="no-warm">No warm leads right now.</div>
+      <div class="no-data">No warm leads right now.</div>
     </div>
   </div>
 
   <!-- Calls Booked + Recent Events -->
-  <div class="two-col">
+  <div class="two-col section-gap">
 
-    <!-- Calls Booked -->
-    <div class="panel">
+    <div class="card">
       <div class="panel-header">
         <span class="panel-title">📅 Calls Booked</span>
         <div class="booked-filter">
-          <button class="booked-btn" onclick="setBookedFilter('today')">Today</button>
-          <button class="booked-btn" onclick="setBookedFilter('yesterday')">Yesterday</button>
-          <button class="booked-btn active" onclick="setBookedFilter('7d')">7 Days</button>
-          <button class="booked-btn" onclick="setBookedFilter('30d')">30 Days</button>
+          <button class="booked-btn" onclick="setBookedFilter('today',event)">Today</button>
+          <button class="booked-btn" onclick="setBookedFilter('yesterday',event)">Yesterday</button>
+          <button class="booked-btn active" onclick="setBookedFilter('7d',event)">7 Days</button>
+          <button class="booked-btn" onclick="setBookedFilter('30d',event)">30 Days</button>
         </div>
       </div>
       <div class="panel-body" id="bookedContainer">
@@ -503,13 +619,12 @@
       </div>
     </div>
 
-    <!-- Recent Events -->
-    <div class="panel">
+    <div class="card">
       <div class="panel-header">
         <span class="panel-title">⚡ Recent Events</span>
         <div style="display:flex;align-items:center;gap:8px;">
-          <span class="badge" id="eventCount">0</span>
-          <select class="filter-select" id="eventTypeFilter" onchange="renderEvents()" style="padding:3px 7px;font-size:11px;">
+          <span class="section-badge" id="eventCount">0</span>
+          <select class="event-type-filter" id="eventTypeFilter" onchange="renderEvents()">
             <option value="">All Types</option>
             <option value="EMAIL_OPENED">Opens</option>
             <option value="CTA_CLICK">CTA Clicks</option>
@@ -530,9 +645,9 @@
   <!-- Contact Table -->
   <div class="table-wrap">
     <div class="table-controls">
-      <div class="section-header" style="margin:0;">
-        <h2>All Contacts</h2>
-        <span class="badge" id="contactCount">0</span>
+      <div class="section-header" style="margin:0;flex:none;">
+        <span class="section-title">All Contacts</span>
+        <span class="section-badge" style="margin-left:8px;" id="contactCount">0</span>
       </div>
       <input class="search-input" id="searchInput" placeholder="Search email or name…" oninput="renderTable()" />
       <select class="filter-select" id="statusFilter" onchange="renderTable()">
@@ -551,7 +666,7 @@
         <option value="PP3">Ecosystem 3 — After Hours</option>
         <option value="PP4">Ecosystem 4 — Owner Bottleneck</option>
       </select>
-      <div class="ml-auto" style="color:var(--muted);font-size:11px;" id="tableStats"></div>
+      <span class="table-stats ml-auto" id="tableStats"></span>
     </div>
     <div id="tableContainer">
       <div class="loading"><div class="spinner"></div>Loading…</div>
@@ -567,181 +682,132 @@ const QUEUE_URL = PUBLISHED_BASE + '&gid=0';
 const EVENT_URL = PUBLISHED_BASE + '&gid=523108680';
 
 // ─── STATE ───────────────────────────────────────────────────────────────────
-let contacts = [];
-let events   = [];
+let contacts = [], events = [];
 let dateRange = { mode: '7d', from: null, to: null };
 let bookedMode = '7d';
 let expandedRows = new Set();
 
 // ─── DATE UTILS ──────────────────────────────────────────────────────────────
-function dayStart(d) {
-  const x = new Date(d); x.setHours(0,0,0,0); return x;
-}
-function dayEnd(d) {
-  const x = new Date(d); x.setHours(23,59,59,999); return x;
-}
+function dayStart(d) { const x=new Date(d); x.setHours(0,0,0,0); return x; }
+function dayEnd(d)   { const x=new Date(d); x.setHours(23,59,59,999); return x; }
 function rangeFor(mode) {
-  const now = new Date();
-  const today = dayStart(now);
-  if (mode === 'today')     return { from: today, to: dayEnd(now) };
-  if (mode === 'yesterday') {
-    const y = new Date(today); y.setDate(y.getDate()-1);
-    return { from: y, to: dayEnd(y) };
-  }
-  if (mode === '7d')  return { from: new Date(now - 7*86400000), to: now };
-  if (mode === '30d') return { from: new Date(now - 30*86400000), to: now };
-  if (mode === 'all') return { from: new Date('2000-01-01'), to: new Date('2099-12-31') };
+  const now = new Date(), today = dayStart(now);
+  if (mode==='today')     return { from: today, to: dayEnd(now) };
+  if (mode==='yesterday') { const y=new Date(today); y.setDate(y.getDate()-1); return {from:y,to:dayEnd(y)}; }
+  if (mode==='7d')  return { from: new Date(now-7*86400000), to: now };
+  if (mode==='30d') return { from: new Date(now-30*86400000), to: now };
+  if (mode==='all') return { from: new Date('2000-01-01'), to: new Date('2099-12-31') };
   return null;
 }
-function inRange(ts, r) {
-  if (!r) return true;
-  const d = new Date(ts);
-  return d >= r.from && d <= r.to;
-}
+function inRange(ts, r) { if(!r) return true; const d=new Date(ts); return d>=r.from&&d<=r.to; }
 function currentRange() {
-  if (dateRange.mode === 'custom') return { from: dateRange.from, to: dateRange.to };
-  return rangeFor(dateRange.mode);
+  return dateRange.mode==='custom' ? { from:dateRange.from, to:dateRange.to } : rangeFor(dateRange.mode);
 }
 
 // ─── DATE FILTER UI ──────────────────────────────────────────────────────────
-function setRange(mode) {
+function setRange(mode, e) {
   dateRange.mode = mode;
-  document.querySelectorAll('.date-btn').forEach(b => b.classList.remove('active'));
-  event.target.classList.add('active');
-  document.getElementById('customDates').classList.toggle('show', mode === 'custom');
-  if (mode !== 'custom') {
-    updateRangeLabel();
-    renderAll();
-  }
+  document.querySelectorAll('.date-btn').forEach(b=>b.classList.remove('active'));
+  if(e && e.target) e.target.classList.add('active');
+  document.getElementById('customDates').classList.toggle('show', mode==='custom');
+  if (mode!=='custom') { updateRangeLabel(); renderAll(); }
 }
 function applyCustom() {
-  const from = document.getElementById('dateFrom').value;
-  const to   = document.getElementById('dateTo').value;
-  if (!from || !to) return;
-  dateRange.from = dayStart(new Date(from));
-  dateRange.to   = dayEnd(new Date(to));
-  updateRangeLabel();
-  renderAll();
+  const from=document.getElementById('dateFrom').value, to=document.getElementById('dateTo').value;
+  if(!from||!to) return;
+  dateRange.from=dayStart(new Date(from)); dateRange.to=dayEnd(new Date(to));
+  updateRangeLabel(); renderAll();
 }
 function updateRangeLabel() {
-  const r = currentRange();
-  if (!r) { document.getElementById('rangeLabel').textContent = ''; return; }
-  const fmt = d => d.toLocaleDateString('en-CA', { month:'short', day:'numeric' });
-  document.getElementById('rangeLabel').textContent =
-    `${fmt(r.from)} – ${fmt(r.to)}`;
+  const r=currentRange();
+  if(!r) { document.getElementById('rangeLabel').textContent=''; return; }
+  const fmt=d=>d.toLocaleDateString('en-CA',{month:'short',day:'numeric'});
+  document.getElementById('rangeLabel').textContent = fmt(r.from)+' – '+fmt(r.to);
 }
 
-// ─── CSV PARSE ───────────────────────────────────────────────────────────────
+// ─── CSV ─────────────────────────────────────────────────────────────────────
 async function fetchCSV(url) {
-  const res = await fetch(url + '&t=' + Date.now());
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const res=await fetch(url+'&t='+Date.now());
+  if(!res.ok) throw new Error('HTTP '+res.status);
   return parseCSV(await res.text());
 }
 function parseCSV(text) {
-  const lines = text.split(/\r?\n/).filter(l => l.trim());
-  if (lines.length < 2) return [];
-  const headers = csvSplit(lines[0]).map(h => h.replace(/\r/g,'').trim());
-  return lines.slice(1).map(line => {
-    const vals = csvSplit(line);
-    const obj = {};
-    headers.forEach((h, i) => { obj[h] = (vals[i]||'').replace(/\r/g,'').trim(); });
+  const lines=text.split(/\r?\n/).filter(l=>l.trim());
+  if(lines.length<2) return [];
+  const headers=csvSplit(lines[0]).map(h=>h.replace(/\r/g,'').trim());
+  return lines.slice(1).map(line=>{
+    const vals=csvSplit(line), obj={};
+    headers.forEach((h,i)=>{ obj[h]=(vals[i]||'').replace(/\r/g,'').trim(); });
     return obj;
   });
 }
 function csvSplit(line) {
-  const vals = []; let cur = '', inQ = false;
-  for (const ch of line) {
-    if (ch === '"') { inQ = !inQ; continue; }
-    if (ch === ',' && !inQ) { vals.push(cur); cur = ''; continue; }
-    cur += ch;
+  const vals=[]; let cur='',inQ=false;
+  for(const ch of line){
+    if(ch==='"'){inQ=!inQ;continue;}
+    if(ch===','&&!inQ){vals.push(cur);cur='';continue;}
+    cur+=ch;
   }
-  vals.push(cur);
-  return vals;
+  vals.push(cur); return vals;
 }
 
 // ─── LOAD ────────────────────────────────────────────────────────────────────
 async function loadAll() {
-  document.getElementById('lastUpdated').textContent = 'Loading…';
+  document.getElementById('lastUpdated').textContent='Loading…';
   try {
-    [contacts, events] = await Promise.all([
-      fetchCSV(QUEUE_URL),
-      fetchCSV(EVENT_URL).catch(() => []),
-    ]);
-    updateRangeLabel();
-    renderAll();
-    document.getElementById('lastUpdated').textContent =
-      'Updated ' + new Date().toLocaleTimeString();
+    [contacts,events]=await Promise.all([fetchCSV(QUEUE_URL), fetchCSV(EVENT_URL).catch(()=>[])]);
+    updateRangeLabel(); renderAll();
+    document.getElementById('lastUpdated').textContent='Updated '+new Date().toLocaleTimeString();
     autoOpenWarm();
-  } catch (e) {
-    document.getElementById('lastUpdated').textContent = 'Error';
-    document.getElementById('tableContainer').innerHTML =
-      '<div class="loading" style="color:#ef4444">⚠ Could not load sheet data.<br><br>' +
-      'Make sure the Google Sheet is published to web:<br>' +
-      '<strong>File → Share → Publish to web → Entire Document → CSV → Publish</strong><br><br>' +
-      '<small style="color:#7c7c96">' + e.message + '</small></div>';
+  } catch(e) {
+    document.getElementById('lastUpdated').textContent='Error';
+    document.getElementById('tableContainer').innerHTML=
+      '<div class="loading" style="color:var(--red)">⚠ Could not load sheet data.<br><br>'+
+      'Make sure the Google Sheet is published to web:<br>'+
+      '<strong>File → Share → Publish to web → Entire Document → CSV → Publish</strong><br><br>'+
+      '<small style="color:var(--muted)">'+e.message+'</small></div>';
     console.error(e);
   }
 }
-function renderAll() {
-  renderKPIs();
-  renderWarmLeads();
-  renderBooked();
-  renderEvents();
-  renderTable();
-}
+function renderAll() { renderKPIs(); renderWarmLeads(); renderBooked(); renderEvents(); renderTable(); }
 
 // ─── KPIs ────────────────────────────────────────────────────────────────────
 function renderKPIs() {
-  const r = currentRange();
-  const inR = e => inRange(e.TIMESTAMP, r);
-  const re = events.filter(inR);
+  const r=currentRange(), re=events.filter(e=>inRange(e.TIMESTAMP,r));
+  const active   = contacts.filter(c=>(c.STATUS||'ACTIVE')==='ACTIVE').length;
+  const warm     = contacts.filter(c=>c.STATUS==='CALL_TRIGGERED').length;
+  const cold     = contacts.filter(c=>c.STATUS==='COLD_NURTURE').length;
+  const complete = contacts.filter(c=>c.STATUS==='COMPLETE').length;
+  const sent     = re.filter(e=>e.EVENT_TYPE==='EMAIL_SENT').length;
+  const opens    = re.filter(e=>e.EVENT_TYPE==='EMAIL_OPENED').length;
+  const clicks   = re.filter(e=>['CTA_CLICK','EMAIL_CLICK'].includes(e.EVENT_TYPE)).length;
+  const lp       = re.filter(e=>e.EVENT_TYPE==='LP_VISIT').length;
+  const video    = re.filter(e=>e.EVENT_TYPE==='VIDEO_PLAYED').length;
+  const booked   = re.filter(e=>['BOOKED','CALENDLY_BOOKED','CALL_BOOKED'].includes(e.EVENT_TYPE)).length;
+  const rebound  = re.filter(e=>e.EVENT_TYPE==='REBOUND_SENT').length;
+  const openRate = sent>0?Math.round(opens/sent*100):0;
+  const clickRate= sent>0?Math.round(clicks/sent*100):0;
 
-  const active   = contacts.filter(c => (c.STATUS || 'ACTIVE') === 'ACTIVE').length;
-  const warm     = contacts.filter(c => c.STATUS === 'CALL_TRIGGERED').length;
-  const cold     = contacts.filter(c => c.STATUS === 'COLD_NURTURE').length;
-  const complete = contacts.filter(c => c.STATUS === 'COMPLETE').length;
-  const total    = contacts.length;
-
-  const sent    = re.filter(e => e.EVENT_TYPE === 'EMAIL_SENT').length;
-  const opens   = re.filter(e => e.EVENT_TYPE === 'EMAIL_OPENED').length;
-  const clicks  = re.filter(e => ['CTA_CLICK','EMAIL_CLICK'].includes(e.EVENT_TYPE)).length;
-  const lp      = re.filter(e => e.EVENT_TYPE === 'LP_VISIT').length;
-  const video   = re.filter(e => e.EVENT_TYPE === 'VIDEO_PLAYED').length;
-  const booked  = re.filter(e => ['BOOKED','CALENDLY_BOOKED','CALL_BOOKED'].includes(e.EVENT_TYPE)).length;
-  const rebound = re.filter(e => e.EVENT_TYPE === 'REBOUND_SENT').length;
-
-  const openRate  = sent > 0 ? Math.round(opens/sent*100) : 0;
-  const clickRate = sent > 0 ? Math.round(clicks/sent*100) : 0;
-
-  setText('kpiActive', active);
-  setText('kpiSent', sent); setText('kpiSentSub', sent ? `in selected range` : '');
-  setText('kpiOpenRate', openRate + '%'); setText('kpiOpenSub', `${opens} opens`);
-  setText('kpiClickRate', clickRate + '%'); setText('kpiClickSub', `${clicks} clicks`);
-  setText('kpiLp', lp);
-  setText('kpiVideo', video);
-  setText('kpiWarm', warm);
-  setText('kpiBooked', booked);
-  setText('kpiRebound', rebound);
-  setText('kpiCold', cold);
-  setText('kpiComplete', complete);
-  setText('kpiTotal', total);
+  set('kpiActive', active);
+  set('kpiSent', sent); set('kpiSentSub', sent ? 'in selected range' : '');
+  set('kpiOpenRate', openRate+'%'); set('kpiOpenSub', opens+' opens');
+  set('kpiClickRate', clickRate+'%'); set('kpiClickSub', clicks+' clicks');
+  set('kpiLp', lp); set('kpiVideo', video); set('kpiWarm', warm);
+  set('kpiBooked', booked); set('kpiRebound', rebound);
+  set('kpiCold', cold); set('kpiComplete', complete); set('kpiTotal', contacts.length);
 }
-function setText(id, v) {
-  const el = document.getElementById(id); if (el) el.textContent = v;
-}
+function set(id,v){ const el=document.getElementById(id); if(el) el.textContent=v; }
 
 // ─── WARM LEADS ──────────────────────────────────────────────────────────────
 function renderWarmLeads() {
-  const warm = contacts.filter(c => c.STATUS === 'CALL_TRIGGERED');
-  setText('warmCount', warm.length);
-  const body = document.getElementById('warmBody');
-  if (!warm.length) { body.innerHTML = '<div class="no-warm">No warm leads right now.</div>'; return; }
-
-  body.innerHTML = warm.map(c => {
-    const trig = getTrigger(c);
-    const name = getName(c);
-    const lacrm = getLacrmLink(c);
+  const warm=contacts.filter(c=>c.STATUS==='CALL_TRIGGERED');
+  set('warmCount', warm.length);
+  const body=document.getElementById('warmBody');
+  if(!warm.length){ body.innerHTML='<div class="no-data">No warm leads right now.</div>'; return; }
+  body.innerHTML=warm.map(c=>{
+    const trig=getTrigger(c), name=getName(c), lacrm=getLacrmLink(c);
     return `<div class="warm-item">
+      <div class="warm-avatar">🔥</div>
       <div class="warm-info">
         <div class="warm-name">${esc(name)}</div>
         <div class="warm-email">${esc(c.EMAIL||'')}</div>
@@ -751,55 +817,45 @@ function renderWarmLeads() {
         <div>${esc(c.SEQUENCE||'PP1')} · Step ${esc(c.STEP||'1')}</div>
         <div style="margin-top:3px;">Opens: ${c.OPEN_COUNT||0} · LP: ${c.LP_CLICK_COUNT||0}</div>
       </div>
-      ${lacrm ? `<a class="open-profile-btn" href="${lacrm}" target="_blank">↗ Profile</a>` : ''}
+      ${lacrm?`<a class="open-profile-btn" href="${lacrm}" target="_blank">↗ Open in LACRM</a>`:''}
     </div>`;
   }).join('');
 }
 function getTrigger(c) {
-  if (c.VIDEO_CLICK==='TRUE' || parseInt(c.VIDEO_CLICK)>0)
-    return { cls:'trigger-video', label:'▶ Video Played' };
-  if (parseInt(c.LP_CLICK_COUNT) >= 2)
-    return { cls:'trigger-lp', label:'🔗 2× LP Visit' };
-  if (parseInt(c.CLICK_COUNT) >= 2)
-    return { cls:'trigger-cta', label:'🎯 2× CTA Click' };
-  if (parseInt(c.OPEN_COUNT) >= 3)
-    return { cls:'trigger-open', label:'👁 3× Opens' };
-  return { cls:'trigger-lp', label:'Warm Lead' };
+  if(c.VIDEO_CLICK==='TRUE'||parseInt(c.VIDEO_CLICK)>0) return {cls:'trigger-video',label:'▶ Video Played'};
+  if(parseInt(c.LP_CLICK_COUNT)>=2) return {cls:'trigger-lp',label:'🔗 2× LP Visit'};
+  if(parseInt(c.CLICK_COUNT)>=2)    return {cls:'trigger-cta',label:'🎯 2× CTA Click'};
+  if(parseInt(c.OPEN_COUNT)>=3)     return {cls:'trigger-open',label:'👁 3× Opens'};
+  return {cls:'trigger-lp',label:'Warm Lead'};
 }
 function toggleWarm() {
   document.getElementById('warmBody').classList.toggle('open');
   document.getElementById('warmChevron').classList.toggle('open');
 }
 function autoOpenWarm() {
-  if (contacts.some(c => c.STATUS === 'CALL_TRIGGERED')) {
+  if(contacts.some(c=>c.STATUS==='CALL_TRIGGERED')) {
     document.getElementById('warmBody').classList.add('open');
     document.getElementById('warmChevron').classList.add('open');
   }
 }
 
 // ─── CALLS BOOKED ────────────────────────────────────────────────────────────
-function setBookedFilter(mode) {
-  bookedMode = mode;
-  document.querySelectorAll('.booked-btn').forEach(b => b.classList.remove('active'));
-  event.target.classList.add('active');
+function setBookedFilter(mode,e) {
+  bookedMode=mode;
+  document.querySelectorAll('.booked-btn').forEach(b=>b.classList.remove('active'));
+  if(e&&e.target) e.target.classList.add('active');
   renderBooked();
 }
 function renderBooked() {
-  const r = rangeFor(bookedMode);
-  const booked = events.filter(e =>
-    ['BOOKED','CALENDLY_BOOKED','CALL_BOOKED'].includes(e.EVENT_TYPE) &&
-    inRange(e.TIMESTAMP, r)
-  ).sort((a,b) => b.TIMESTAMP.localeCompare(a.TIMESTAMP));
-
-  const cont = document.getElementById('bookedContainer');
-  if (!booked.length) {
-    cont.innerHTML = '<div class="no-warm">No calls booked in this period.</div>';
-    return;
-  }
-  cont.innerHTML = booked.map(e => {
-    const ts   = e.TIMESTAMP ? new Date(e.TIMESTAMP).toLocaleString('en-CA', {month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}) : '';
-    const name = e.FULL_NAME || (e.EMAIL||'').split('@')[0];
-    const isNathan = (e.DETAIL||'').toLowerCase().includes('nathan');
+  const r=rangeFor(bookedMode);
+  const booked=events.filter(e=>['BOOKED','CALENDLY_BOOKED','CALL_BOOKED'].includes(e.EVENT_TYPE)&&inRange(e.TIMESTAMP,r))
+    .sort((a,b)=>b.TIMESTAMP.localeCompare(a.TIMESTAMP));
+  const cont=document.getElementById('bookedContainer');
+  if(!booked.length){ cont.innerHTML='<div class="no-data">No calls booked in this period.</div>'; return; }
+  cont.innerHTML=booked.map(e=>{
+    const ts=e.TIMESTAMP?new Date(e.TIMESTAMP).toLocaleString('en-CA',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}):'';
+    const name=e.FULL_NAME||(e.EMAIL||'').split('@')[0];
+    const isNathan=(e.DETAIL||'').toLowerCase().includes('nathan');
     return `<div class="booked-item">
       <div class="booked-avatar">📅</div>
       <div class="booked-info">
@@ -808,98 +864,118 @@ function renderBooked() {
       </div>
       <div class="booked-meta">
         <div><span class="booked-rep ${isNathan?'rep-nathan':'rep-richie'}">${isNathan?'Nathan':'Richie'}</span></div>
-        <div style="margin-top:4px;">${esc(ts)}</div>
+        <div class="booked-time">${esc(ts)}</div>
       </div>
     </div>`;
   }).join('');
 }
 
+// ─── EVENTS ──────────────────────────────────────────────────────────────────
+function renderEvents() {
+  const r=currentRange(), typeF=document.getElementById('eventTypeFilter').value;
+  const evts=events.filter(e=>inRange(e.TIMESTAMP,r)&&(!typeF||e.EVENT_TYPE===typeF))
+    .sort((a,b)=>b.TIMESTAMP.localeCompare(a.TIMESTAMP)).slice(0,60);
+  set('eventCount', evts.length);
+  const cont=document.getElementById('eventContainer');
+  if(!evts.length){ cont.innerHTML='<div class="no-data">No events in this range.</div>'; return; }
+  cont.innerHTML=evts.map(e=>{
+    const ts=e.TIMESTAMP?new Date(e.TIMESTAMP).toLocaleString('en-CA',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}):'';
+    const cls=typeClass(e.EVENT_TYPE);
+    return `<div class="log-item">
+      <span class="log-time">${esc(ts)}</span>
+      <span class="log-type ${cls}">${esc((e.EVENT_TYPE||'').replace(/_/g,' '))}</span>
+      <span class="log-email">${esc(e.EMAIL||'')}</span>
+      <span class="log-detail">${esc(e.DETAIL||'')}${e.SEQUENCE?' · '+e.SEQUENCE+' S'+(e.STEP||''):''}</span>
+    </div>`;
+  }).join('');
+}
+function typeClass(t) {
+  return {EMAIL_SENT:'type-sent',EMAIL_OPENED:'type-open',EMAIL_OPEN:'type-open',
+    EMAIL_CLICK:'type-click',LP_VISIT:'type-lp',LP_VISITED:'type-lp',
+    CTA_CLICK:'type-cta',VIDEO_PLAY:'type-video',VIDEO_PLAYED:'type-video',
+    REBOUND_SENT:'type-cta',CALL_TRIGGERED:'type-trigger',
+    BOOKED:'type-booked',CALENDLY_BOOKED:'type-booked',CALL_BOOKED:'type-booked'}[t]||'type-sent';
+}
+
 // ─── CONTACT TABLE ───────────────────────────────────────────────────────────
 function renderTable() {
-  const search = (document.getElementById('searchInput').value||'').toLowerCase();
-  const status = document.getElementById('statusFilter').value;
-  const seq    = document.getElementById('seqFilter').value;
-
-  let filtered = contacts.filter(c => {
-    const name = getName(c).toLowerCase();
-    const email = (c.EMAIL||'').toLowerCase();
-    if (search && !email.includes(search) && !name.includes(search)) return false;
-    if (status && c.STATUS !== status) return false;
-    if (seq && (c.SEQUENCE||'PP1') !== seq) return false;
+  const search=(document.getElementById('searchInput').value||'').toLowerCase();
+  const status=document.getElementById('statusFilter').value;
+  const seq=document.getElementById('seqFilter').value;
+  let filtered=contacts.filter(c=>{
+    const name=getName(c).toLowerCase(), email=(c.EMAIL||'').toLowerCase();
+    if(search&&!email.includes(search)&&!name.includes(search)) return false;
+    if(status&&c.STATUS!==status) return false;
+    if(seq&&(c.SEQUENCE||'PP1')!==seq) return false;
     return true;
   });
-
-  setText('contactCount', filtered.length);
-
-  // Summary stats
-  const activeN  = filtered.filter(c => (c.STATUS||'ACTIVE')==='ACTIVE').length;
-  const warmN    = filtered.filter(c => c.STATUS==='CALL_TRIGGERED').length;
-  const totalOpen = filtered.reduce((s,c) => s + (parseInt(c.OPEN_COUNT)||0), 0);
-  document.getElementById('tableStats').textContent =
-    `Active: ${activeN} · Warm: ${warmN} · Total opens: ${totalOpen}`;
-
-  if (!filtered.length) {
-    document.getElementById('tableContainer').innerHTML =
-      '<div class="loading">No contacts match the filter.</div>';
+  set('contactCount', filtered.length);
+  const activeN=filtered.filter(c=>(c.STATUS||'ACTIVE')==='ACTIVE').length;
+  const warmN=filtered.filter(c=>c.STATUS==='CALL_TRIGGERED').length;
+  const totalOpen=filtered.reduce((s,c)=>s+(parseInt(c.OPEN_COUNT)||0),0);
+  document.getElementById('tableStats').textContent=`Active: ${activeN} · Warm: ${warmN} · Total opens: ${totalOpen}`;
+  if(!filtered.length){
+    document.getElementById('tableContainer').innerHTML='<div class="loading">No contacts match the filter.</div>';
     return;
   }
-
-  const rows = filtered.map(c => {
-    const seqV = c.SEQUENCE || 'PP1';
-    const stat = c.STATUS || 'ACTIVE';
-    const lacrm = getLacrmLink(c);
-    const name  = getName(c);
-    const isExpanded = expandedRows.has(c.EMAIL);
-    const contactEvts = events
-      .filter(e => e.EMAIL === c.EMAIL)
-      .sort((a,b) => b.TIMESTAMP.localeCompare(a.TIMESTAMP));
-    const opens   = contactEvts.filter(e=>e.EVENT_TYPE==='EMAIL_OPENED').length;
-    const clicks  = contactEvts.filter(e=>['CTA_CLICK','EMAIL_CLICK'].includes(e.EVENT_TYPE)).length;
-    const lpV     = contactEvts.filter(e=>e.EVENT_TYPE==='LP_VISIT').length;
-    const videoV  = contactEvts.filter(e=>e.EVENT_TYPE==='VIDEO_PLAYED').length;
-    const rebV    = contactEvts.filter(e=>e.EVENT_TYPE==='REBOUND_SENT').length;
-    const callT   = contactEvts.filter(e=>e.EVENT_TYPE==='CALL_TRIGGERED').length;
-    const hasEvent = opens||clicks||lpV||videoV||rebV||callT;
-
-    const tlRows = contactEvts.slice(0,20).map(e => {
-      const ts = e.TIMESTAMP ? new Date(e.TIMESTAMP).toLocaleString('en-CA',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}) : '';
-      const cls = typeClass(e.EVENT_TYPE);
+  const rows=filtered.map(c=>{
+    const seqV=c.SEQUENCE||'PP1', stat=c.STATUS||'ACTIVE';
+    const lacrm=getLacrmLink(c), name=getName(c);
+    const isExpanded=expandedRows.has(c.EMAIL);
+    const cEvts=events.filter(e=>e.EMAIL===c.EMAIL).sort((a,b)=>b.TIMESTAMP.localeCompare(a.TIMESTAMP));
+    const opens=cEvts.filter(e=>e.EVENT_TYPE==='EMAIL_OPENED').length;
+    const clicks=cEvts.filter(e=>['CTA_CLICK','EMAIL_CLICK'].includes(e.EVENT_TYPE)).length;
+    const lpV=cEvts.filter(e=>e.EVENT_TYPE==='LP_VISIT').length;
+    const videoV=cEvts.filter(e=>e.EVENT_TYPE==='VIDEO_PLAYED').length;
+    const rebV=cEvts.filter(e=>e.EVENT_TYPE==='REBOUND_SENT').length;
+    const callT=cEvts.filter(e=>e.EVENT_TYPE==='CALL_TRIGGERED').length;
+    const hasEvt=opens||clicks||lpV||videoV||rebV||callT;
+    const tlRows=cEvts.slice(0,20).map(e=>{
+      const ts=e.TIMESTAMP?new Date(e.TIMESTAMP).toLocaleString('en-CA',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}):'';
       return `<div class="tl-item">
         <div class="tl-time">${esc(ts)}</div>
-        <span class="tl-type log-type ${cls}">${esc(e.EVENT_TYPE.replace(/_/g,' '))}</span>
-        <div class="tl-detail">${esc(e.DETAIL||'')}${e.SEQUENCE?` · ${e.SEQUENCE} Step ${e.STEP||''}`:''}${e.FULL_NAME&&!e.DETAIL?` ${e.FULL_NAME}`:''}</div>
+        <span class="tl-type log-type ${typeClass(e.EVENT_TYPE)}">${esc((e.EVENT_TYPE||'').replace(/_/g,' '))}</span>
+        <div class="tl-detail">${esc(e.DETAIL||'')}${e.SEQUENCE?' · '+e.SEQUENCE+' S'+(e.STEP||''):''}</div>
       </div>`;
     }).join('');
-
+    const chipClass={ACTIVE:'chip-active',CALL_TRIGGERED:'chip-call',REBOUND_PENDING:'chip-rebound',
+      COLD_NURTURE:'chip-cold',COMPLETE:'chip-complete',REMOVED:'chip-removed'}[stat]||'chip-active';
+    const dotClass={ACTIVE:'dot-active',CALL_TRIGGERED:'dot-call',REBOUND_PENDING:'dot-rebound',
+      COLD_NURTURE:'dot-cold',COMPLETE:'dot-complete',REMOVED:'dot-removed'}[stat]||'dot-active';
+    const emailId='expand-'+btoa(c.EMAIL).replace(/[^a-zA-Z0-9]/g,'');
     return `<tr class="contact-row" onclick="toggleExpand('${esc(c.EMAIL)}')">
       <td>
         <div class="email-cell">${esc(c.EMAIL||'')}</div>
-        ${name !== (c.EMAIL||'').split('@')[0] ? `<div class="contact-name">${esc(name)}</div>` : ''}
+        ${name!==(c.EMAIL||'').split('@')[0]?`<div class="contact-name">${esc(name)}</div>`:''}
       </td>
       <td><span class="seq-badge ${seqV.toLowerCase()}">${esc(seqV)}</span></td>
-      <td>${esc(c.STEP||'1')}</td>
+      <td style="color:var(--muted);font-weight:600;">${esc(c.STEP||'1')}</td>
       <td>
-        <span class="status-dot ${statusDot(stat)}"></span>
-        ${esc(stat.replace(/_/g,' '))}
+        <span class="status-chip ${chipClass}">
+          <span class="status-dot ${dotClass}"></span>
+          ${esc(stat.replace(/_/g,' '))}
+        </span>
       </td>
       <td>
         <div class="stat-pills">
-          ${c.OPEN_COUNT && c.OPEN_COUNT!=='0' ? `<span class="pill pill-opens">👁 ${c.OPEN_COUNT}</span>` : ''}
-          ${c.CLICK_COUNT && c.CLICK_COUNT!=='0' ? `<span class="pill pill-clicks">🎯 ${c.CLICK_COUNT}</span>` : ''}
-          ${c.LP_CLICK_COUNT && c.LP_CLICK_COUNT!=='0' ? `<span class="pill pill-lp">LP ${c.LP_CLICK_COUNT}</span>` : ''}
-          ${(c.VIDEO_CLICK==='TRUE'||parseInt(c.VIDEO_CLICK)>0) ? `<span class="pill pill-video">▶ Video</span>` : ''}
-          ${c.REBOUND_SENT==='TRUE' ? `<span class="pill pill-rebound">Rebound</span>` : ''}
+          ${c.OPEN_COUNT&&c.OPEN_COUNT!=='0'?`<span class="pill pill-opens">👁 ${c.OPEN_COUNT}</span>`:''}
+          ${c.CLICK_COUNT&&c.CLICK_COUNT!=='0'?`<span class="pill pill-clicks">🎯 ${c.CLICK_COUNT}</span>`:''}
+          ${c.LP_CLICK_COUNT&&c.LP_CLICK_COUNT!=='0'?`<span class="pill pill-lp">LP ${c.LP_CLICK_COUNT}</span>`:''}
+          ${(c.VIDEO_CLICK==='TRUE'||parseInt(c.VIDEO_CLICK)>0)?`<span class="pill pill-video">▶ Video</span>`:''}
+          ${c.REBOUND_SENT==='TRUE'?`<span class="pill pill-rebound">Rebound</span>`:''}
         </div>
       </td>
-      <td>${esc(c.NEXT_SEND_DATE||'')}</td>
-      <td style="display:flex;align-items:center;gap:8px;">
-        ${lacrm ? `<a class="profile-link" href="${lacrm}" target="_blank" onclick="event.stopPropagation()">↗ LACRM</a>` : ''}
-        ${hasEvent ? `<span class="expand-chevron${isExpanded?' open':''}">▼</span>` : ''}
+      <td style="color:var(--muted);font-size:12px;">${esc(c.NEXT_SEND_DATE||'—')}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px;">
+          ${lacrm?`<a class="profile-link" href="${lacrm}" target="_blank" onclick="event.stopPropagation()">↗ LACRM</a>`:''}
+          ${hasEvt?`<span class="expand-chevron${isExpanded?' open':''}">▼</span>`:''}
+        </div>
       </td>
     </tr>
     <tr class="expand-row">
       <td colspan="7">
-        <div class="expand-panel${isExpanded?' open':''}" id="expand-${btoa(c.EMAIL).replace(/[^a-zA-Z0-9]/g,'')}">
+        <div class="expand-panel${isExpanded?' open':''}" id="${emailId}">
           <div class="expand-inner">
             <div class="contact-stats">
               <div class="c-stat"><div class="c-stat-label">Opens</div><div class="c-stat-val yellow">${opens||0}</div></div>
@@ -910,111 +986,55 @@ function renderTable() {
               <div class="c-stat"><div class="c-stat-label">Call Triggers</div><div class="c-stat-val orange">${callT||0}</div></div>
             </div>
             <div class="timeline-title">Event Timeline</div>
-            ${contactEvts.length ? tlRows : '<div class="timeline-empty">No events logged for this contact yet.</div>'}
+            ${cEvts.length?tlRows:'<div style="color:var(--muted);font-size:12px;">No events logged yet.</div>'}
           </div>
         </div>
       </td>
     </tr>`;
   }).join('');
-
-  document.getElementById('tableContainer').innerHTML = `
+  document.getElementById('tableContainer').innerHTML=`
     <table>
-      <thead>
-        <tr>
-          <th>Email / Name</th><th>Sequence</th><th>Step</th><th>Status</th>
-          <th>Engagement</th><th>Next Send</th><th>Actions</th>
-        </tr>
-      </thead>
+      <thead><tr>
+        <th>Email / Name</th><th>Sequence</th><th>Step</th><th>Status</th>
+        <th>Engagement</th><th>Next Send</th><th>Actions</th>
+      </tr></thead>
       <tbody>${rows}</tbody>
     </table>`;
 }
 
 function toggleExpand(email) {
-  const id = 'expand-' + btoa(email).replace(/[^a-zA-Z0-9]/g,'');
-  const panel = document.getElementById(id);
-  if (!panel) return;
-  const isOpen = panel.classList.contains('open');
-  if (isOpen) {
-    expandedRows.delete(email);
-    panel.classList.remove('open');
-  } else {
-    expandedRows.add(email);
-    panel.classList.add('open');
-  }
-  // flip chevron
-  const rows = document.querySelectorAll('.contact-row');
-  rows.forEach(row => {
-    const emailCell = row.querySelector('.email-cell');
-    if (emailCell && emailCell.textContent.trim() === email) {
-      const chev = row.querySelector('.expand-chevron');
-      if (chev) chev.classList.toggle('open');
+  const id='expand-'+btoa(email).replace(/[^a-zA-Z0-9]/g,'');
+  const panel=document.getElementById(id);
+  if(!panel) return;
+  const isOpen=panel.classList.contains('open');
+  if(isOpen) expandedRows.delete(email); else expandedRows.add(email);
+  panel.classList.toggle('open');
+  document.querySelectorAll('.contact-row').forEach(row=>{
+    const ec=row.querySelector('.email-cell');
+    if(ec&&ec.textContent.trim()===email){
+      const ch=row.querySelector('.expand-chevron');
+      if(ch) ch.classList.toggle('open');
     }
   });
 }
 
-function statusDot(s) {
-  return { ACTIVE:'dot-active', REBOUND_PENDING:'dot-rebound', CALL_TRIGGERED:'dot-call',
-    COLD_NURTURE:'dot-cold', COMPLETE:'dot-complete', REMOVED:'dot-removed' }[s] || 'dot-active';
-}
-
-// ─── EVENT LOG ───────────────────────────────────────────────────────────────
-function renderEvents() {
-  const r = currentRange();
-  const typeF = document.getElementById('eventTypeFilter').value;
-  let evts = events
-    .filter(e => inRange(e.TIMESTAMP, r))
-    .filter(e => !typeF || e.EVENT_TYPE === typeF)
-    .sort((a,b) => b.TIMESTAMP.localeCompare(a.TIMESTAMP))
-    .slice(0, 60);
-
-  setText('eventCount', evts.length);
-  const cont = document.getElementById('eventContainer');
-  if (!evts.length) {
-    cont.innerHTML = '<div class="no-warm">No events in this range.</div>';
-    return;
-  }
-  cont.innerHTML = evts.map(e => {
-    const ts  = e.TIMESTAMP ? new Date(e.TIMESTAMP).toLocaleString('en-CA',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}) : '';
-    const cls = typeClass(e.EVENT_TYPE);
-    return `<div class="log-item">
-      <span class="log-time">${esc(ts)}</span>
-      <span class="log-type ${cls}">${esc((e.EVENT_TYPE||'').replace(/_/g,' '))}</span>
-      <span class="log-email">${esc(e.EMAIL||'')}</span>
-      <span class="log-detail">${esc(e.DETAIL||'')}${e.SEQUENCE?` · ${e.SEQUENCE} S${e.STEP||''}`:''}</span>
-    </div>`;
-  }).join('');
-}
-
-function typeClass(t) {
-  return {
-    EMAIL_SENT:'type-sent', EMAIL_OPENED:'type-open', EMAIL_OPEN:'type-open',
-    EMAIL_CLICK:'type-click', LP_VISIT:'type-lp', LP_VISITED:'type-lp',
-    CTA_CLICK:'type-cta', VIDEO_PLAY:'type-video', VIDEO_PLAYED:'type-video',
-    REBOUND_SENT:'type-cta', CALL_TRIGGERED:'type-trigger',
-    BOOKED:'type-booked', CALENDLY_BOOKED:'type-booked', CALL_BOOKED:'type-booked',
-  }[t] || 'type-sent';
-}
-
 // ─── UTILS ───────────────────────────────────────────────────────────────────
 function getName(c) {
-  const ev = events.find(e => e.EMAIL === c.EMAIL && e.FULL_NAME);
-  return (ev && ev.FULL_NAME) ? ev.FULL_NAME : (c.EMAIL||'').split('@')[0];
+  const ev=events.find(e=>e.EMAIL===c.EMAIL&&e.FULL_NAME);
+  return (ev&&ev.FULL_NAME)?ev.FULL_NAME:(c.EMAIL||'').split('@')[0];
 }
 function getLacrmLink(c) {
-  const ev = events.find(e => e.EMAIL === c.EMAIL && e.LACRM_ID);
-  if (ev && ev.LACRM_ID)
-    return `https://account.lessannoyingcrm.com/app/View_Contact?ContactId=${ev.LACRM_ID}`;
+  const ev=events.find(e=>e.EMAIL===c.EMAIL&&e.LACRM_ID);
+  if(ev&&ev.LACRM_ID) return `https://account.lessannoyingcrm.com/app/View_Contact?ContactId=${ev.LACRM_ID}`;
   return `https://account.lessannoyingcrm.com/app/Search?q=${encodeURIComponent(c.EMAIL||'')}`;
 }
 function esc(s) {
-  return String(s||'')
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 // ─── INIT ────────────────────────────────────────────────────────────────────
 loadAll();
-setInterval(loadAll, 5 * 60 * 1000);
+setInterval(loadAll, 5*60*1000);
 </script>
 </body>
 </html>
