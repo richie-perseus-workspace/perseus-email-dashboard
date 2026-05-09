@@ -592,18 +592,10 @@
       .table-stats { display: none; }
       .ml-auto { margin-left: 0; }
 
-      /* Table — horizontal scroll; hide low-priority cols */
-      .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-      table { min-width: 520px; }
-      thead th:nth-child(3),
-      tbody td:nth-child(3),
-      thead th:nth-child(6),
-      tbody td:nth-child(6) { display: none; }
-
       /* Expand panel */
       .contact-stats { grid-template-columns: repeat(3, 1fr); gap: 8px; }
       .expand-inner { padding: 14px; }
-      .tl-time { width: 90px; font-size: 10px; }
+      .tl-time { width: 80px; font-size: 10px; }
 
       /* Section gap */
       .section-gap { margin-bottom: 16px; }
@@ -615,10 +607,30 @@
       .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 7px; }
       .kpi-value { font-size: 22px; }
       .contact-stats { grid-template-columns: repeat(2, 1fr); }
-      table { min-width: 440px; }
-      thead th:nth-child(5),
-      tbody td:nth-child(5) { max-width: 120px; }
     }
+
+    /* ── Mobile Contact Cards ── */
+    .contact-card {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+    .contact-card:hover, .contact-card:active { background: #fafafa; }
+    .card-row1 {
+      display: flex; justify-content: space-between;
+      align-items: flex-start; gap: 10px; margin-bottom: 8px;
+    }
+    .card-email { font-weight: 700; font-size: 13px; color: var(--text); letter-spacing: -0.01em; word-break: break-all; }
+    .card-name  { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .card-row2  { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; margin-bottom: 10px; }
+    .card-step  { font-size: 11px; color: var(--muted); font-weight: 600; }
+    .card-actions { display: flex; align-items: center; justify-content: space-between; }
+    .card-expand-panel {
+      margin-top: 12px; background: #f8f8fa;
+      border-radius: 10px; overflow: hidden; display: none;
+    }
+    .card-expand-panel.open { display: block; }
   </style>
 </head>
 <body>
@@ -983,17 +995,69 @@ function typeClass(t) {
 }
 
 // ─── CONTACT TABLE ───────────────────────────────────────────────────────────
-function renderTable() {
+function getFiltered() {
   const search=(document.getElementById('searchInput').value||'').toLowerCase();
   const status=document.getElementById('statusFilter').value;
   const seq=document.getElementById('seqFilter').value;
-  let filtered=contacts.filter(c=>{
+  return contacts.filter(c=>{
     const name=getName(c).toLowerCase(), email=(c.EMAIL||'').toLowerCase();
     if(search&&!email.includes(search)&&!name.includes(search)) return false;
     if(status&&c.STATUS!==status) return false;
     if(seq&&(c.SEQUENCE||'PP1')!==seq) return false;
     return true;
   });
+}
+
+function contactEvtData(c) {
+  const cEvts=events.filter(e=>e.EMAIL===c.EMAIL).sort((a,b)=>b.TIMESTAMP.localeCompare(a.TIMESTAMP));
+  const opens=cEvts.filter(e=>e.EVENT_TYPE==='EMAIL_OPENED').length;
+  const clicks=cEvts.filter(e=>['CTA_CLICK','EMAIL_CLICK'].includes(e.EVENT_TYPE)).length;
+  const lpV=cEvts.filter(e=>e.EVENT_TYPE==='LP_VISIT').length;
+  const videoV=cEvts.filter(e=>e.EVENT_TYPE==='VIDEO_PLAYED').length;
+  const rebV=cEvts.filter(e=>e.EVENT_TYPE==='REBOUND_SENT').length;
+  const callT=cEvts.filter(e=>e.EVENT_TYPE==='CALL_TRIGGERED').length;
+  return {cEvts,opens,clicks,lpV,videoV,rebV,callT,hasEvt:opens||clicks||lpV||videoV||rebV||callT};
+}
+
+function expandInnerHTML(opens,clicks,lpV,videoV,rebV,callT,cEvts) {
+  const tlRows=cEvts.slice(0,20).map(e=>{
+    const ts=e.TIMESTAMP?new Date(e.TIMESTAMP).toLocaleString('en-CA',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}):'';
+    return `<div class="tl-item">
+      <div class="tl-time">${esc(ts)}</div>
+      <span class="tl-type log-type ${typeClass(e.EVENT_TYPE)}">${esc((e.EVENT_TYPE||'').replace(/_/g,' '))}</span>
+      <div class="tl-detail">${esc(e.DETAIL||'')}${e.SEQUENCE?' · '+e.SEQUENCE+' S'+(e.STEP||''):''}</div>
+    </div>`;
+  }).join('');
+  return `<div class="contact-stats">
+    <div class="c-stat"><div class="c-stat-label">Opens</div><div class="c-stat-val yellow">${opens||0}</div></div>
+    <div class="c-stat"><div class="c-stat-label">CTA Clicks</div><div class="c-stat-val purple">${clicks||0}</div></div>
+    <div class="c-stat"><div class="c-stat-label">LP Visits</div><div class="c-stat-val green">${lpV||0}</div></div>
+    <div class="c-stat"><div class="c-stat-label">Video Plays</div><div class="c-stat-val orange">${videoV||0}</div></div>
+    <div class="c-stat"><div class="c-stat-label">Rebound Sent</div><div class="c-stat-val red">${rebV||0}</div></div>
+    <div class="c-stat"><div class="c-stat-label">Call Triggers</div><div class="c-stat-val orange">${callT||0}</div></div>
+  </div>
+  <div class="timeline-title">Event Timeline</div>
+  ${cEvts.length?tlRows:'<div style="color:var(--muted);font-size:12px;">No events logged yet.</div>'}`;
+}
+
+function getChipDotClass(stat) {
+  const chips={ACTIVE:'chip-active',CALL_TRIGGERED:'chip-call',REBOUND_PENDING:'chip-rebound',
+    COLD_NURTURE:'chip-cold',COMPLETE:'chip-complete',REMOVED:'chip-removed'};
+  const dots={ACTIVE:'dot-active',CALL_TRIGGERED:'dot-call',REBOUND_PENDING:'dot-rebound',
+    COLD_NURTURE:'dot-cold',COMPLETE:'dot-complete',REMOVED:'dot-removed'};
+  return {chipClass:chips[stat]||'chip-active',dotClass:dots[stat]||'dot-active'};
+}
+
+function engagementPillsHTML(c) {
+  return `${c.OPEN_COUNT&&c.OPEN_COUNT!=='0'?`<span class="pill pill-opens">👁 ${c.OPEN_COUNT}</span>`:''}
+    ${c.CLICK_COUNT&&c.CLICK_COUNT!=='0'?`<span class="pill pill-clicks">🎯 ${c.CLICK_COUNT}</span>`:''}
+    ${c.LP_CLICK_COUNT&&c.LP_CLICK_COUNT!=='0'?`<span class="pill pill-lp">LP ${c.LP_CLICK_COUNT}</span>`:''}
+    ${(c.VIDEO_CLICK==='TRUE'||parseInt(c.VIDEO_CLICK)>0)?`<span class="pill pill-video">▶ Video</span>`:''}
+    ${c.REBOUND_SENT==='TRUE'?`<span class="pill pill-rebound">Rebound</span>`:''}`;
+}
+
+function renderTable() {
+  const filtered=getFiltered();
   set('contactCount', filtered.length);
   const activeN=filtered.filter(c=>(c.STATUS||'ACTIVE')==='ACTIVE').length;
   const warmN=filtered.filter(c=>c.STATUS==='CALL_TRIGGERED').length;
@@ -1003,30 +1067,56 @@ function renderTable() {
     document.getElementById('tableContainer').innerHTML='<div class="loading">No contacts match the filter.</div>';
     return;
   }
+  if(window.innerWidth<=768) renderMobileCards(filtered);
+  else renderDesktopTable(filtered);
+}
+
+function renderMobileCards(filtered) {
+  const cards=filtered.map(c=>{
+    const seqV=c.SEQUENCE||'PP1', stat=c.STATUS||'ACTIVE';
+    const lacrm=getLacrmLink(c), name=getName(c);
+    const isExpanded=expandedRows.has(c.EMAIL);
+    const {cEvts,opens,clicks,lpV,videoV,rebV,callT,hasEvt}=contactEvtData(c);
+    const {chipClass,dotClass}=getChipDotClass(stat);
+    const emailId='expand-'+btoa(c.EMAIL).replace(/[^a-zA-Z0-9]/g,'');
+    const showName=name!==(c.EMAIL||'').split('@')[0];
+    return `<div class="contact-card" onclick="toggleExpand('${esc(c.EMAIL)}')">
+      <div class="card-row1">
+        <div style="min-width:0;flex:1;">
+          <div class="card-email">${esc(c.EMAIL||'')}</div>
+          ${showName?`<div class="card-name">${esc(name)}</div>`:''}
+        </div>
+        <span class="status-chip ${chipClass}" style="flex-shrink:0;">
+          <span class="status-dot ${dotClass}"></span>
+          ${esc(stat.replace(/_/g,' '))}
+        </span>
+      </div>
+      <div class="card-row2">
+        <span class="seq-badge ${seqV.toLowerCase()}">${esc(seqV)}</span>
+        <span class="card-step">Step ${esc(c.STEP||'1')}</span>
+        ${engagementPillsHTML(c)}
+      </div>
+      <div class="card-actions">
+        ${lacrm?`<a class="profile-link" href="${lacrm}" target="_blank" onclick="event.stopPropagation()" style="font-size:11px;padding:3px 10px;">↗ LACRM</a>`:'<span></span>'}
+        ${hasEvt?`<span class="expand-chevron${isExpanded?' open':''}">▼ Timeline</span>`:''}
+      </div>
+      <div class="card-expand-panel${isExpanded?' open':''}" id="${emailId}" onclick="event.stopPropagation()">
+        <div class="expand-inner">
+          ${expandInnerHTML(opens,clicks,lpV,videoV,rebV,callT,cEvts)}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('tableContainer').innerHTML=`<div>${cards}</div>`;
+}
+
+function renderDesktopTable(filtered) {
   const rows=filtered.map(c=>{
     const seqV=c.SEQUENCE||'PP1', stat=c.STATUS||'ACTIVE';
     const lacrm=getLacrmLink(c), name=getName(c);
     const isExpanded=expandedRows.has(c.EMAIL);
-    const cEvts=events.filter(e=>e.EMAIL===c.EMAIL).sort((a,b)=>b.TIMESTAMP.localeCompare(a.TIMESTAMP));
-    const opens=cEvts.filter(e=>e.EVENT_TYPE==='EMAIL_OPENED').length;
-    const clicks=cEvts.filter(e=>['CTA_CLICK','EMAIL_CLICK'].includes(e.EVENT_TYPE)).length;
-    const lpV=cEvts.filter(e=>e.EVENT_TYPE==='LP_VISIT').length;
-    const videoV=cEvts.filter(e=>e.EVENT_TYPE==='VIDEO_PLAYED').length;
-    const rebV=cEvts.filter(e=>e.EVENT_TYPE==='REBOUND_SENT').length;
-    const callT=cEvts.filter(e=>e.EVENT_TYPE==='CALL_TRIGGERED').length;
-    const hasEvt=opens||clicks||lpV||videoV||rebV||callT;
-    const tlRows=cEvts.slice(0,20).map(e=>{
-      const ts=e.TIMESTAMP?new Date(e.TIMESTAMP).toLocaleString('en-CA',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}):'';
-      return `<div class="tl-item">
-        <div class="tl-time">${esc(ts)}</div>
-        <span class="tl-type log-type ${typeClass(e.EVENT_TYPE)}">${esc((e.EVENT_TYPE||'').replace(/_/g,' '))}</span>
-        <div class="tl-detail">${esc(e.DETAIL||'')}${e.SEQUENCE?' · '+e.SEQUENCE+' S'+(e.STEP||''):''}</div>
-      </div>`;
-    }).join('');
-    const chipClass={ACTIVE:'chip-active',CALL_TRIGGERED:'chip-call',REBOUND_PENDING:'chip-rebound',
-      COLD_NURTURE:'chip-cold',COMPLETE:'chip-complete',REMOVED:'chip-removed'}[stat]||'chip-active';
-    const dotClass={ACTIVE:'dot-active',CALL_TRIGGERED:'dot-call',REBOUND_PENDING:'dot-rebound',
-      COLD_NURTURE:'dot-cold',COMPLETE:'dot-complete',REMOVED:'dot-removed'}[stat]||'dot-active';
+    const {cEvts,opens,clicks,lpV,videoV,rebV,callT,hasEvt}=contactEvtData(c);
+    const {chipClass,dotClass}=getChipDotClass(stat);
     const emailId='expand-'+btoa(c.EMAIL).replace(/[^a-zA-Z0-9]/g,'');
     return `<tr class="contact-row" onclick="toggleExpand('${esc(c.EMAIL)}')">
       <td>
@@ -1041,15 +1131,7 @@ function renderTable() {
           ${esc(stat.replace(/_/g,' '))}
         </span>
       </td>
-      <td>
-        <div class="stat-pills">
-          ${c.OPEN_COUNT&&c.OPEN_COUNT!=='0'?`<span class="pill pill-opens">👁 ${c.OPEN_COUNT}</span>`:''}
-          ${c.CLICK_COUNT&&c.CLICK_COUNT!=='0'?`<span class="pill pill-clicks">🎯 ${c.CLICK_COUNT}</span>`:''}
-          ${c.LP_CLICK_COUNT&&c.LP_CLICK_COUNT!=='0'?`<span class="pill pill-lp">LP ${c.LP_CLICK_COUNT}</span>`:''}
-          ${(c.VIDEO_CLICK==='TRUE'||parseInt(c.VIDEO_CLICK)>0)?`<span class="pill pill-video">▶ Video</span>`:''}
-          ${c.REBOUND_SENT==='TRUE'?`<span class="pill pill-rebound">Rebound</span>`:''}
-        </div>
-      </td>
+      <td><div class="stat-pills">${engagementPillsHTML(c)}</div></td>
       <td style="color:var(--muted);font-size:12px;">${esc(c.NEXT_SEND_DATE||'—')}</td>
       <td>
         <div style="display:flex;align-items:center;gap:8px;">
@@ -1062,16 +1144,7 @@ function renderTable() {
       <td colspan="7">
         <div class="expand-panel${isExpanded?' open':''}" id="${emailId}">
           <div class="expand-inner">
-            <div class="contact-stats">
-              <div class="c-stat"><div class="c-stat-label">Opens</div><div class="c-stat-val yellow">${opens||0}</div></div>
-              <div class="c-stat"><div class="c-stat-label">CTA Clicks</div><div class="c-stat-val purple">${clicks||0}</div></div>
-              <div class="c-stat"><div class="c-stat-label">LP Visits</div><div class="c-stat-val green">${lpV||0}</div></div>
-              <div class="c-stat"><div class="c-stat-label">Video Plays</div><div class="c-stat-val orange">${videoV||0}</div></div>
-              <div class="c-stat"><div class="c-stat-label">Rebound Sent</div><div class="c-stat-val red">${rebV||0}</div></div>
-              <div class="c-stat"><div class="c-stat-label">Call Triggers</div><div class="c-stat-val orange">${callT||0}</div></div>
-            </div>
-            <div class="timeline-title">Event Timeline</div>
-            ${cEvts.length?tlRows:'<div style="color:var(--muted);font-size:12px;">No events logged yet.</div>'}
+            ${expandInnerHTML(opens,clicks,lpV,videoV,rebV,callT,cEvts)}
           </div>
         </div>
       </td>
@@ -1094,10 +1167,10 @@ function toggleExpand(email) {
   const isOpen=panel.classList.contains('open');
   if(isOpen) expandedRows.delete(email); else expandedRows.add(email);
   panel.classList.toggle('open');
-  document.querySelectorAll('.contact-row').forEach(row=>{
-    const ec=row.querySelector('.email-cell');
-    if(ec&&ec.textContent.trim()===email){
-      const ch=row.querySelector('.expand-chevron');
+  // update chevron — works for both table rows and cards
+  document.querySelectorAll('.email-cell, .card-email').forEach(el=>{
+    if(el.textContent.trim()===email){
+      const ch=el.closest('tr,div.contact-card')?.querySelector('.expand-chevron');
       if(ch) ch.classList.toggle('open');
     }
   });
@@ -1120,6 +1193,8 @@ function esc(s) {
 // ─── INIT ────────────────────────────────────────────────────────────────────
 loadAll();
 setInterval(loadAll, 5*60*1000);
+let resizeTimer;
+window.addEventListener('resize', ()=>{ clearTimeout(resizeTimer); resizeTimer=setTimeout(renderTable,150); });
 </script>
 </body>
 </html>
