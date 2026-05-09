@@ -19,6 +19,7 @@
       --orange:      #f97316;
       --red:         #ef4444;
       --yellow:      #eab308;
+      --blue:        #3b82f6;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -29,244 +30,236 @@
       min-height: 100vh;
     }
 
-    /* ── Top Bar ───────────────────────────────────────────── */
+    /* ── Top Bar ── */
     .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 18px 32px;
-      border-bottom: 1px solid var(--border);
-      background: var(--bg2);
-      position: sticky;
-      top: 0;
-      z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 28px; border-bottom: 1px solid var(--border);
+      background: var(--bg2); position: sticky; top: 0; z-index: 200;
     }
-    .logo {
-      font-size: 18px;
-      font-weight: 700;
-      letter-spacing: -0.5px;
-      color: #fff;
-    }
+    .logo { font-size: 17px; font-weight: 700; letter-spacing: -0.5px; color: #fff; }
     .logo span { color: var(--purple); }
+    .topbar-right { display: flex; align-items: center; gap: 14px; }
+    .last-updated { color: var(--muted); font-size: 12px; }
     .refresh-btn {
-      background: var(--purple);
-      border: none;
-      color: #fff;
-      padding: 8px 18px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 13px;
-      font-weight: 600;
-      transition: background 0.2s;
+      background: var(--purple); border: none; color: #fff;
+      padding: 7px 16px; border-radius: 6px; cursor: pointer;
+      font-size: 13px; font-weight: 600; transition: background 0.2s;
     }
     .refresh-btn:hover { background: var(--purple-dim); }
-    .last-updated { color: var(--muted); font-size: 12px; }
 
-    /* ── Layout ────────────────────────────────────────────── */
-    .main { padding: 28px 32px; max-width: 1400px; margin: 0 auto; }
+    /* ── Date Filter Bar ── */
+    .date-bar {
+      background: var(--bg2); border-bottom: 1px solid var(--border);
+      padding: 10px 28px; display: flex; align-items: center; gap: 10px;
+      flex-wrap: wrap; position: sticky; top: 57px; z-index: 190;
+    }
+    .date-bar-label { color: var(--muted); font-size: 12px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.6px; margin-right: 4px; }
+    .date-btn {
+      background: var(--bg3); border: 1px solid var(--border);
+      color: var(--muted); padding: 5px 13px; border-radius: 5px;
+      cursor: pointer; font-size: 12px; font-weight: 600;
+      transition: all 0.15s;
+    }
+    .date-btn:hover { border-color: var(--purple); color: var(--text); }
+    .date-btn.active {
+      background: var(--purple-glow); border-color: var(--purple);
+      color: var(--purple);
+    }
+    .custom-dates { display: none; align-items: center; gap: 8px; }
+    .custom-dates.show { display: flex; }
+    .date-input {
+      background: var(--bg3); border: 1px solid var(--border);
+      color: var(--text); padding: 5px 9px; border-radius: 5px;
+      font-size: 12px; outline: none;
+    }
+    .date-input:focus { border-color: var(--purple); }
+    .date-apply {
+      background: var(--purple); border: none; color: #fff;
+      padding: 5px 12px; border-radius: 5px; cursor: pointer;
+      font-size: 12px; font-weight: 600;
+    }
 
-    /* ── KPI Cards ─────────────────────────────────────────── */
+    /* ── Layout ── */
+    .main { padding: 24px 28px; max-width: 1500px; margin: 0 auto; }
+
+    /* ── Section Headers ── */
+    .section-header {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
+    }
+    .section-header h2 { font-size: 14px; font-weight: 600; color: #fff; }
+    .badge {
+      background: var(--purple-glow); border: 1px solid rgba(105,56,239,0.3);
+      color: var(--purple); padding: 2px 8px; border-radius: 20px;
+      font-size: 11px; font-weight: 700;
+    }
+
+    /* ── KPI Grid ── */
     .kpi-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 16px;
-      margin-bottom: 32px;
+      grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+      gap: 14px; margin-bottom: 28px;
     }
     .kpi {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 20px 18px;
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 18px 16px; cursor: default;
     }
-    .kpi-label { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; }
-    .kpi-value { font-size: 28px; font-weight: 700; color: #fff; line-height: 1; }
+    .kpi-label { color: var(--muted); font-size: 10px; text-transform: uppercase;
+      letter-spacing: 0.8px; margin-bottom: 8px; }
+    .kpi-value { font-size: 26px; font-weight: 700; color: #fff; line-height: 1; }
     .kpi-value.green  { color: var(--green); }
     .kpi-value.orange { color: var(--orange); }
     .kpi-value.purple { color: var(--purple); }
+    .kpi-value.red    { color: var(--red); }
     .kpi-sub { color: var(--muted); font-size: 11px; margin-top: 6px; }
 
-    /* ── Section Headers ───────────────────────────────────── */
-    .section-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 16px;
-    }
-    .section-header h2 {
-      font-size: 15px;
-      font-weight: 600;
-      color: #fff;
-    }
-    .badge {
-      background: var(--purple-glow);
-      border: 1px solid rgba(105,56,239,0.3);
-      color: var(--purple);
-      padding: 2px 8px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 700;
-    }
+    /* ── Two-col layout ── */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+    @media (max-width: 960px) { .two-col { grid-template-columns: 1fr; } }
 
-    /* ── Warm Leads Panel ──────────────────────────────────── */
+    /* ── Panel ── */
+    .panel {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 10px; overflow: hidden;
+    }
+    .panel-header {
+      padding: 12px 18px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .panel-title { font-weight: 600; font-size: 13px; color: #fff; }
+    .panel-body { overflow-y: auto; max-height: 340px; }
+
+    /* ── Warm Leads ── */
     .warm-panel {
-      background: var(--bg2);
-      border: 1px solid rgba(249,115,22,0.25);
-      border-radius: 10px;
-      margin-bottom: 28px;
-      overflow: hidden;
+      background: var(--bg2); border: 1px solid rgba(249,115,22,0.25);
+      border-radius: 10px; overflow: hidden; margin-bottom: 24px;
     }
-    .warm-panel-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 14px 20px;
-      border-bottom: 1px solid var(--border);
-      cursor: pointer;
-      user-select: none;
+    .warm-header {
+      padding: 12px 18px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      cursor: pointer; user-select: none;
     }
-    .warm-title {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-weight: 600;
-      font-size: 14px;
-      color: var(--orange);
-    }
+    .warm-title { display: flex; align-items: center; gap: 10px;
+      font-weight: 600; font-size: 13px; color: var(--orange); }
     .fire-dot {
-      width: 8px; height: 8px;
-      background: var(--orange);
-      border-radius: 50%;
-      animation: pulse 1.5s infinite;
+      width: 8px; height: 8px; background: var(--orange);
+      border-radius: 50%; animation: pulse 1.5s infinite;
     }
     @keyframes pulse {
       0%, 100% { opacity: 1; transform: scale(1); }
-      50%       { opacity: 0.5; transform: scale(1.3); }
+      50%       { opacity: 0.5; transform: scale(1.4); }
     }
-    .chevron { color: var(--muted); font-size: 16px; transition: transform 0.2s; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .chevron { color: var(--muted); font-size: 14px; transition: transform 0.2s; }
     .chevron.open { transform: rotate(180deg); }
     .warm-body { display: none; }
     .warm-body.open { display: block; }
-
     .warm-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px 20px;
-      border-bottom: 1px solid var(--border);
-      gap: 12px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 11px 18px; border-bottom: 1px solid var(--border); gap: 12px;
     }
     .warm-item:last-child { border-bottom: none; }
     .warm-info { flex: 1; min-width: 0; }
     .warm-name { font-weight: 600; color: #fff; font-size: 13px; }
-    .warm-email { color: var(--muted); font-size: 12px; margin-top: 2px; }
+    .warm-email { color: var(--muted); font-size: 11px; margin-top: 2px; }
     .warm-trigger {
-      font-size: 11px;
-      padding: 3px 8px;
-      border-radius: 4px;
-      font-weight: 600;
-      white-space: nowrap;
+      font-size: 10px; padding: 3px 8px; border-radius: 4px;
+      font-weight: 600; white-space: nowrap;
     }
     .trigger-lp    { background: rgba(105,56,239,0.15); color: #a78bfa; }
     .trigger-cta   { background: rgba(249,115,22,0.15); color: var(--orange); }
     .trigger-video { background: rgba(34,197,94,0.12);  color: var(--green); }
     .trigger-open  { background: rgba(234,179,8,0.12);  color: var(--yellow); }
-
-    .warm-meta { color: var(--muted); font-size: 11px; text-align: right; }
+    .warm-meta { color: var(--muted); font-size: 11px; text-align: right; white-space: nowrap; }
     .open-profile-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      background: transparent;
-      border: 1px solid rgba(105,56,239,0.4);
-      color: var(--purple);
-      padding: 5px 12px;
-      border-radius: 5px;
-      text-decoration: none;
-      font-size: 12px;
-      font-weight: 600;
-      transition: background 0.2s, border-color 0.2s;
-      white-space: nowrap;
+      display: inline-flex; align-items: center; gap: 4px;
+      background: transparent; border: 1px solid rgba(105,56,239,0.4);
+      color: var(--purple); padding: 4px 10px; border-radius: 5px;
+      text-decoration: none; font-size: 11px; font-weight: 600;
+      transition: background 0.2s; white-space: nowrap;
     }
-    .open-profile-btn:hover {
-      background: var(--purple-glow);
-      border-color: var(--purple);
-    }
+    .open-profile-btn:hover { background: var(--purple-glow); }
+    .no-warm { padding: 20px; text-align: center; color: var(--muted); font-size: 12px; }
 
-    .no-warm {
-      padding: 24px 20px;
-      text-align: center;
-      color: var(--muted);
-      font-size: 13px;
+    /* ── Booked Panel ── */
+    .booked-filter { display: flex; gap: 6px; }
+    .booked-btn {
+      background: var(--bg3); border: 1px solid var(--border);
+      color: var(--muted); padding: 3px 10px; border-radius: 4px;
+      cursor: pointer; font-size: 11px; font-weight: 600; transition: all 0.15s;
     }
+    .booked-btn:hover { border-color: var(--green); color: var(--text); }
+    .booked-btn.active { background: rgba(34,197,94,0.12); border-color: var(--green); color: var(--green); }
+    .booked-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 18px; border-bottom: 1px solid var(--border);
+    }
+    .booked-item:last-child { border-bottom: none; }
+    .booked-avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: rgba(34,197,94,0.15); border: 1px solid var(--green);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; flex-shrink: 0;
+    }
+    .booked-info { flex: 1; min-width: 0; }
+    .booked-name { font-weight: 600; color: #fff; font-size: 13px; }
+    .booked-email { color: var(--muted); font-size: 11px; }
+    .booked-meta { color: var(--muted); font-size: 11px; text-align: right; white-space: nowrap; }
+    .booked-rep { font-size: 10px; padding: 2px 7px; border-radius: 4px; font-weight: 700; }
+    .rep-richie  { background: rgba(105,56,239,0.15); color: #a78bfa; }
+    .rep-nathan  { background: rgba(59,130,246,0.15); color: var(--blue); }
 
-    /* ── Contact Table ─────────────────────────────────────── */
+    /* ── Contact Table ── */
     .table-wrap {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      overflow: hidden;
-      margin-bottom: 28px;
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 10px; overflow: hidden; margin-bottom: 24px;
     }
     .table-controls {
-      padding: 14px 20px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      flex-wrap: wrap;
+      padding: 12px 18px; border-bottom: 1px solid var(--border);
+      display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
     }
     .search-input {
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      color: var(--text);
-      padding: 7px 12px;
-      font-size: 13px;
-      width: 220px;
-      outline: none;
+      background: var(--bg3); border: 1px solid var(--border);
+      border-radius: 6px; color: var(--text); padding: 6px 11px;
+      font-size: 13px; width: 200px; outline: none;
     }
     .search-input:focus { border-color: var(--purple); }
     .filter-select {
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      color: var(--text);
-      padding: 7px 10px;
-      font-size: 13px;
-      outline: none;
-      cursor: pointer;
+      background: var(--bg3); border: 1px solid var(--border);
+      border-radius: 6px; color: var(--text); padding: 6px 9px;
+      font-size: 12px; outline: none; cursor: pointer;
     }
     .filter-select:focus { border-color: var(--purple); }
+    .ml-auto { margin-left: auto; }
 
     table { width: 100%; border-collapse: collapse; }
     thead th {
-      padding: 10px 16px;
-      text-align: left;
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.7px;
-      color: var(--muted);
-      border-bottom: 1px solid var(--border);
-      white-space: nowrap;
+      padding: 9px 14px; text-align: left; font-size: 10px;
+      text-transform: uppercase; letter-spacing: 0.7px; color: var(--muted);
+      border-bottom: 1px solid var(--border); white-space: nowrap;
     }
-    tbody tr {
+    tbody tr.contact-row {
       border-bottom: 1px solid var(--border);
-      transition: background 0.15s;
+      cursor: pointer; transition: background 0.12s;
     }
-    tbody tr:last-child { border-bottom: none; }
-    tbody tr:hover { background: rgba(255,255,255,0.025); }
+    tbody tr.contact-row:hover { background: rgba(255,255,255,0.03); }
+    tbody tr.expand-row { border-bottom: 1px solid var(--border); }
+    tbody tr.expand-row td { padding: 0; }
+    .expand-panel {
+      background: var(--bg3); padding: 0;
+      display: none; border-top: 1px solid var(--border);
+    }
+    .expand-panel.open { display: block; }
+    .expand-inner { padding: 16px 18px; }
     td {
-      padding: 11px 16px;
-      font-size: 13px;
-      vertical-align: middle;
+      padding: 10px 14px; font-size: 12px; vertical-align: middle;
     }
     .email-cell { font-weight: 500; color: #fff; }
+    .contact-name { color: var(--muted); font-size: 11px; margin-top: 2px; }
+
     .seq-badge {
-      display: inline-block;
-      padding: 2px 7px;
-      border-radius: 4px;
-      font-size: 11px;
-      font-weight: 700;
+      display: inline-block; padding: 2px 7px; border-radius: 4px;
+      font-size: 10px; font-weight: 700;
     }
     .pp1 { background: rgba(105,56,239,0.15); color: #a78bfa; }
     .pp2 { background: rgba(34,197,94,0.12);  color: var(--green); }
@@ -274,10 +267,8 @@
     .pp4 { background: rgba(234,179,8,0.12);  color: var(--yellow); }
 
     .status-dot {
-      display: inline-block;
-      width: 7px; height: 7px;
-      border-radius: 50%;
-      margin-right: 6px;
+      display: inline-block; width: 7px; height: 7px;
+      border-radius: 50%; margin-right: 5px;
     }
     .dot-active   { background: var(--green); }
     .dot-rebound  { background: var(--yellow); }
@@ -288,62 +279,81 @@
 
     .stat-pills { display: flex; gap: 4px; flex-wrap: wrap; }
     .pill {
-      font-size: 10px;
-      padding: 2px 6px;
-      border-radius: 3px;
-      font-weight: 600;
-      white-space: nowrap;
+      font-size: 10px; padding: 2px 6px; border-radius: 3px;
+      font-weight: 600; white-space: nowrap;
     }
     .pill-opens  { background: rgba(234,179,8,0.12);  color: var(--yellow); }
     .pill-clicks { background: rgba(105,56,239,0.15); color: #a78bfa; }
     .pill-lp     { background: rgba(34,197,94,0.12);  color: var(--green); }
     .pill-video  { background: rgba(249,115,22,0.12); color: var(--orange); }
+    .pill-rebound { background: rgba(239,68,68,0.12); color: var(--red); }
 
     .profile-link {
-      color: var(--purple);
-      text-decoration: none;
-      font-size: 12px;
-      font-weight: 600;
-      padding: 3px 8px;
-      border: 1px solid rgba(105,56,239,0.3);
-      border-radius: 4px;
-      transition: background 0.2s;
+      color: var(--purple); text-decoration: none; font-size: 11px;
+      font-weight: 600; padding: 3px 7px; border: 1px solid rgba(105,56,239,0.3);
+      border-radius: 4px; transition: background 0.2s; white-space: nowrap;
     }
     .profile-link:hover { background: var(--purple-glow); }
 
-    /* ── Event Log ─────────────────────────────────────────── */
+    .expand-chevron { color: var(--muted); font-size: 11px; transition: transform 0.2s; }
+    .expand-chevron.open { transform: rotate(180deg); }
+
+    /* ── Expand Panel — Contact Stats ── */
+    .contact-stats {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 10px; margin-bottom: 14px;
+    }
+    .c-stat {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 7px; padding: 12px 14px;
+    }
+    .c-stat-label { color: var(--muted); font-size: 10px; text-transform: uppercase;
+      letter-spacing: 0.6px; margin-bottom: 5px; }
+    .c-stat-val { font-size: 20px; font-weight: 700; color: #fff; }
+    .c-stat-val.yellow { color: var(--yellow); }
+    .c-stat-val.purple { color: #a78bfa; }
+    .c-stat-val.green  { color: var(--green); }
+    .c-stat-val.orange { color: var(--orange); }
+    .c-stat-val.red    { color: var(--red); }
+
+    /* ── Contact Timeline ── */
+    .timeline-title { font-size: 11px; font-weight: 600; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.7px; margin-bottom: 8px; }
+    .timeline-empty { color: var(--muted); font-size: 12px; }
+    .tl-item {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .tl-item:last-child { border-bottom: none; }
+    .tl-dot {
+      width: 8px; height: 8px; border-radius: 50%; margin-top: 3px;
+      flex-shrink: 0;
+    }
+    .tl-time { color: var(--muted); font-size: 11px; white-space: nowrap; width: 120px; flex-shrink: 0; }
+    .tl-type { font-size: 10px; padding: 1px 6px; border-radius: 3px;
+      font-weight: 700; white-space: nowrap; flex-shrink: 0; }
+    .tl-detail { color: var(--muted); font-size: 11px; flex: 1; }
+
+    /* ── Event Log ── */
     .event-log {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      overflow: hidden;
-      margin-bottom: 28px;
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 10px; overflow: hidden; margin-bottom: 24px;
     }
     .log-header {
-      padding: 14px 20px;
-      border-bottom: 1px solid var(--border);
-      font-weight: 600;
-      font-size: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      padding: 12px 18px; border-bottom: 1px solid var(--border);
+      font-weight: 600; font-size: 13px;
+      display: flex; align-items: center; justify-content: space-between;
     }
+    .log-controls { display: flex; align-items: center; gap: 10px; }
     .log-item {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 10px 20px;
-      border-bottom: 1px solid var(--border);
-      font-size: 12px;
+      display: flex; align-items: center; gap: 12px;
+      padding: 9px 18px; border-bottom: 1px solid var(--border); font-size: 11px;
     }
     .log-item:last-child { border-bottom: none; }
-    .log-time { color: var(--muted); white-space: nowrap; min-width: 80px; }
+    .log-time { color: var(--muted); white-space: nowrap; min-width: 130px; }
     .log-type {
-      padding: 2px 7px;
-      border-radius: 4px;
-      font-weight: 700;
-      font-size: 10px;
-      white-space: nowrap;
+      padding: 2px 6px; border-radius: 4px; font-weight: 700;
+      font-size: 10px; white-space: nowrap;
     }
     .type-sent    { background: rgba(105,56,239,0.15); color: #a78bfa; }
     .type-open    { background: rgba(234,179,8,0.12);  color: var(--yellow); }
@@ -352,25 +362,22 @@
     .type-cta     { background: rgba(249,115,22,0.12); color: var(--orange); }
     .type-video   { background: rgba(249,115,22,0.12); color: var(--orange); }
     .type-trigger { background: rgba(239,68,68,0.12);  color: var(--red); }
-    .log-email { color: #fff; font-weight: 500; }
+    .type-booked  { background: rgba(34,197,94,0.15);  color: var(--green); }
+    .log-email { color: #fff; font-weight: 500; flex-shrink: 0; }
     .log-detail { color: var(--muted); flex: 1; }
 
-    /* ── Loading / Error states ────────────────────────────── */
-    .loading { padding: 40px; text-align: center; color: var(--muted); }
+    /* ── Loading ── */
+    .loading { padding: 32px; text-align: center; color: var(--muted); }
     .spinner {
-      width: 24px; height: 24px;
-      border: 2px solid var(--border);
-      border-top-color: var(--purple);
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-      margin: 0 auto 12px;
+      width: 22px; height: 22px; border: 2px solid var(--border);
+      border-top-color: var(--purple); border-radius: 50%;
+      animation: spin 0.7s linear infinite; margin: 0 auto 10px;
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ── Responsive ────────────────────────────────────────── */
+    /* ── Responsive ── */
     @media (max-width: 768px) {
-      .main { padding: 16px; }
-      .topbar { padding: 14px 16px; }
+      .main { padding: 14px; }
+      .topbar, .date-bar { padding: 12px 14px; }
       .kpi-grid { grid-template-columns: repeat(2, 1fr); }
       .search-input { width: 100%; }
     }
@@ -381,29 +388,90 @@
 <!-- Top Bar -->
 <div class="topbar">
   <div class="logo"><span>Perseus</span> &nbsp;Email Dashboard</div>
-  <div style="display:flex;align-items:center;gap:16px;">
+  <div class="topbar-right">
     <span class="last-updated" id="lastUpdated">Not loaded</span>
     <button class="refresh-btn" onclick="loadAll()">↻ Refresh</button>
   </div>
+</div>
+
+<!-- Date Filter Bar -->
+<div class="date-bar">
+  <span class="date-bar-label">Range:</span>
+  <button class="date-btn" onclick="setRange('today')">Today</button>
+  <button class="date-btn" onclick="setRange('yesterday')">Yesterday</button>
+  <button class="date-btn active" onclick="setRange('7d')">7 Days</button>
+  <button class="date-btn" onclick="setRange('30d')">30 Days</button>
+  <button class="date-btn" onclick="setRange('all')">All Time</button>
+  <button class="date-btn" onclick="setRange('custom')">Custom</button>
+  <div class="custom-dates" id="customDates">
+    <input type="date" class="date-input" id="dateFrom" />
+    <span style="color:var(--muted)">→</span>
+    <input type="date" class="date-input" id="dateTo" />
+    <button class="date-apply" onclick="applyCustom()">Apply</button>
+  </div>
+  <span id="rangeLabel" style="color:var(--muted);font-size:12px;margin-left:6px;"></span>
 </div>
 
 <div class="main">
 
   <!-- KPI Grid -->
   <div class="kpi-grid" id="kpiGrid">
-    <div class="kpi"><div class="kpi-label">Active Contacts</div><div class="kpi-value purple" id="kpiActive">—</div></div>
-    <div class="kpi"><div class="kpi-label">Emails Sent (7d)</div><div class="kpi-value" id="kpiSent">—</div></div>
-    <div class="kpi"><div class="kpi-label">Open Rate (7d)</div><div class="kpi-value green" id="kpiOpenRate">—</div></div>
-    <div class="kpi"><div class="kpi-label">Click Rate (7d)</div><div class="kpi-value green" id="kpiClickRate">—</div></div>
-    <div class="kpi"><div class="kpi-label">Warm Leads</div><div class="kpi-value orange" id="kpiWarm">—</div></div>
-    <div class="kpi"><div class="kpi-label">Calls Booked (7d)</div><div class="kpi-value green" id="kpiBooked">—</div></div>
-    <div class="kpi"><div class="kpi-label">Cold Nurture</div><div class="kpi-value" id="kpiCold">—</div></div>
-    <div class="kpi"><div class="kpi-label">Completed</div><div class="kpi-value" id="kpiComplete">—</div></div>
+    <div class="kpi">
+      <div class="kpi-label">Active Contacts</div>
+      <div class="kpi-value purple" id="kpiActive">—</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Emails Sent</div>
+      <div class="kpi-value" id="kpiSent">—</div>
+      <div class="kpi-sub" id="kpiSentSub"></div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Open Rate</div>
+      <div class="kpi-value green" id="kpiOpenRate">—</div>
+      <div class="kpi-sub" id="kpiOpenSub"></div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Click Rate</div>
+      <div class="kpi-value green" id="kpiClickRate">—</div>
+      <div class="kpi-sub" id="kpiClickSub"></div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">LP Visits</div>
+      <div class="kpi-value purple" id="kpiLp">—</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Video Plays</div>
+      <div class="kpi-value orange" id="kpiVideo">—</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Warm Leads</div>
+      <div class="kpi-value orange" id="kpiWarm">—</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Calls Booked</div>
+      <div class="kpi-value green" id="kpiBooked">—</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Rebound Sent</div>
+      <div class="kpi-value" id="kpiRebound">—</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Cold Nurture</div>
+      <div class="kpi-value" id="kpiCold">—</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Completed</div>
+      <div class="kpi-value" id="kpiComplete">—</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Total Contacts</div>
+      <div class="kpi-value" id="kpiTotal">—</div>
+    </div>
   </div>
 
-  <!-- Warm Leads Dropdown -->
+  <!-- Warm Leads -->
   <div class="warm-panel">
-    <div class="warm-panel-header" onclick="toggleWarm()">
+    <div class="warm-header" onclick="toggleWarm()">
       <div class="warm-title">
         <div class="fire-dot"></div>
         🔥 Warm Leads — Call Now
@@ -412,8 +480,51 @@
       <span class="chevron" id="warmChevron">▼</span>
     </div>
     <div class="warm-body" id="warmBody">
-      <div class="no-warm" id="warmEmpty">No warm leads right now.</div>
+      <div class="no-warm">No warm leads right now.</div>
     </div>
+  </div>
+
+  <!-- Calls Booked + Recent Events -->
+  <div class="two-col">
+
+    <!-- Calls Booked -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">📅 Calls Booked</span>
+        <div class="booked-filter">
+          <button class="booked-btn" onclick="setBookedFilter('today')">Today</button>
+          <button class="booked-btn" onclick="setBookedFilter('yesterday')">Yesterday</button>
+          <button class="booked-btn active" onclick="setBookedFilter('7d')">7 Days</button>
+          <button class="booked-btn" onclick="setBookedFilter('30d')">30 Days</button>
+        </div>
+      </div>
+      <div class="panel-body" id="bookedContainer">
+        <div class="loading"><div class="spinner"></div>Loading…</div>
+      </div>
+    </div>
+
+    <!-- Recent Events -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">⚡ Recent Events</span>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="badge" id="eventCount">0</span>
+          <select class="filter-select" id="eventTypeFilter" onchange="renderEvents()" style="padding:3px 7px;font-size:11px;">
+            <option value="">All Types</option>
+            <option value="EMAIL_OPENED">Opens</option>
+            <option value="CTA_CLICK">CTA Clicks</option>
+            <option value="LP_VISIT">LP Visits</option>
+            <option value="VIDEO_PLAYED">Video</option>
+            <option value="CALL_TRIGGERED">Call Triggered</option>
+            <option value="EMAIL_SENT">Sent</option>
+          </select>
+        </div>
+      </div>
+      <div class="panel-body" id="eventContainer">
+        <div class="loading"><div class="spinner"></div>Loading…</div>
+      </div>
+    </div>
+
   </div>
 
   <!-- Contact Table -->
@@ -423,7 +534,7 @@
         <h2>All Contacts</h2>
         <span class="badge" id="contactCount">0</span>
       </div>
-      <input class="search-input" id="searchInput" placeholder="Search email…" oninput="renderTable()" />
+      <input class="search-input" id="searchInput" placeholder="Search email or name…" oninput="renderTable()" />
       <select class="filter-select" id="statusFilter" onchange="renderTable()">
         <option value="">All Statuses</option>
         <option value="ACTIVE">Active</option>
@@ -435,24 +546,14 @@
       </select>
       <select class="filter-select" id="seqFilter" onchange="renderTable()">
         <option value="">All Sequences</option>
-        <option value="PP1">PP1 — Repeating Tasks</option>
-        <option value="PP2">PP2 — Shouldering Accountability</option>
-        <option value="PP3">PP3 — Flying Blind</option>
-        <option value="PP4">PP4 — Not Empowered</option>
+        <option value="PP1">Ecosystem 1 — Repeating Tasks</option>
+        <option value="PP2">Ecosystem 2 — Retention</option>
+        <option value="PP3">Ecosystem 3 — After Hours</option>
+        <option value="PP4">Ecosystem 4 — Owner Bottleneck</option>
       </select>
+      <div class="ml-auto" style="color:var(--muted);font-size:11px;" id="tableStats"></div>
     </div>
     <div id="tableContainer">
-      <div class="loading"><div class="spinner"></div>Loading…</div>
-    </div>
-  </div>
-
-  <!-- Recent Events -->
-  <div class="event-log">
-    <div class="log-header">
-      <span>Recent Events</span>
-      <span class="badge" id="eventCount">0</span>
-    </div>
-    <div id="eventContainer">
       <div class="loading"><div class="spinner"></div>Loading…</div>
     </div>
   </div>
@@ -460,226 +561,359 @@
 </div>
 
 <script>
-// ─── CONFIG ─────────────────────────────────────────────────────────────────
-// Replace SHEET_ID and API_KEY with your values.
-// The sheet must be published or use a service account key for private sheets.
-// Easiest option: publish the sheet to web (read-only) and use the CSV export URLs.
-
+// ─── CONFIG ──────────────────────────────────────────────────────────────────
 const PUBLISHED_BASE = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTaqValm0L1uEK6jU32dy1nh-YaFjIEjrtItfLBW_BirVfxoq6B7KmAsJsPM6f2JdXpqMAwDzJJnO3W/pub?output=csv';
-
 const QUEUE_URL = PUBLISHED_BASE + '&gid=0';
 const EVENT_URL = PUBLISHED_BASE + '&gid=523108680';
 
 // ─── STATE ───────────────────────────────────────────────────────────────────
 let contacts = [];
 let events   = [];
+let dateRange = { mode: '7d', from: null, to: null };
+let bookedMode = '7d';
+let expandedRows = new Set();
 
-// ─── FETCH + PARSE CSV ───────────────────────────────────────────────────────
-async function fetchCSV(url) {
-  const res = await fetch(url + '&t=' + Date.now()); // bust cache
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  const text = await res.text();
-  return parseCSV(text);
+// ─── DATE UTILS ──────────────────────────────────────────────────────────────
+function dayStart(d) {
+  const x = new Date(d); x.setHours(0,0,0,0); return x;
+}
+function dayEnd(d) {
+  const x = new Date(d); x.setHours(23,59,59,999); return x;
+}
+function rangeFor(mode) {
+  const now = new Date();
+  const today = dayStart(now);
+  if (mode === 'today')     return { from: today, to: dayEnd(now) };
+  if (mode === 'yesterday') {
+    const y = new Date(today); y.setDate(y.getDate()-1);
+    return { from: y, to: dayEnd(y) };
+  }
+  if (mode === '7d')  return { from: new Date(now - 7*86400000), to: now };
+  if (mode === '30d') return { from: new Date(now - 30*86400000), to: now };
+  if (mode === 'all') return { from: new Date('2000-01-01'), to: new Date('2099-12-31') };
+  return null;
+}
+function inRange(ts, r) {
+  if (!r) return true;
+  const d = new Date(ts);
+  return d >= r.from && d <= r.to;
+}
+function currentRange() {
+  if (dateRange.mode === 'custom') return { from: dateRange.from, to: dateRange.to };
+  return rangeFor(dateRange.mode);
 }
 
+// ─── DATE FILTER UI ──────────────────────────────────────────────────────────
+function setRange(mode) {
+  dateRange.mode = mode;
+  document.querySelectorAll('.date-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('customDates').classList.toggle('show', mode === 'custom');
+  if (mode !== 'custom') {
+    updateRangeLabel();
+    renderAll();
+  }
+}
+function applyCustom() {
+  const from = document.getElementById('dateFrom').value;
+  const to   = document.getElementById('dateTo').value;
+  if (!from || !to) return;
+  dateRange.from = dayStart(new Date(from));
+  dateRange.to   = dayEnd(new Date(to));
+  updateRangeLabel();
+  renderAll();
+}
+function updateRangeLabel() {
+  const r = currentRange();
+  if (!r) { document.getElementById('rangeLabel').textContent = ''; return; }
+  const fmt = d => d.toLocaleDateString('en-CA', { month:'short', day:'numeric' });
+  document.getElementById('rangeLabel').textContent =
+    `${fmt(r.from)} – ${fmt(r.to)}`;
+}
+
+// ─── CSV PARSE ───────────────────────────────────────────────────────────────
+async function fetchCSV(url) {
+  const res = await fetch(url + '&t=' + Date.now());
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return parseCSV(await res.text());
+}
 function parseCSV(text) {
-  const lines = text.trim().split('\n');
+  const lines = text.split(/\r?\n/).filter(l => l.trim());
   if (lines.length < 2) return [];
-  const headers = lines[0].split(',').map(h => h.replace(/^"|"$/g, '').trim());
+  const headers = csvSplit(lines[0]).map(h => h.replace(/\r/g,'').trim());
   return lines.slice(1).map(line => {
-    // Handle quoted fields with commas
-    const values = [];
-    let cur = '', inQ = false;
-    for (const ch of line) {
-      if (ch === '"') { inQ = !inQ; continue; }
-      if (ch === ',' && !inQ) { values.push(cur.trim()); cur = ''; continue; }
-      cur += ch;
-    }
-    values.push(cur.trim());
+    const vals = csvSplit(line);
     const obj = {};
-    headers.forEach((h, i) => { obj[h] = values[i] || ''; });
+    headers.forEach((h, i) => { obj[h] = (vals[i]||'').replace(/\r/g,'').trim(); });
     return obj;
   });
 }
+function csvSplit(line) {
+  const vals = []; let cur = '', inQ = false;
+  for (const ch of line) {
+    if (ch === '"') { inQ = !inQ; continue; }
+    if (ch === ',' && !inQ) { vals.push(cur); cur = ''; continue; }
+    cur += ch;
+  }
+  vals.push(cur);
+  return vals;
+}
 
-// ─── LOAD ALL DATA ───────────────────────────────────────────────────────────
+// ─── LOAD ────────────────────────────────────────────────────────────────────
 async function loadAll() {
   document.getElementById('lastUpdated').textContent = 'Loading…';
   try {
     [contacts, events] = await Promise.all([
       fetchCSV(QUEUE_URL),
-      fetchCSV(EVENT_URL).catch(() => []), // Events tab may not exist yet
+      fetchCSV(EVENT_URL).catch(() => []),
     ]);
-    renderKPIs();
-    renderWarmLeads();
-    renderTable();
-    renderEvents();
+    updateRangeLabel();
+    renderAll();
     document.getElementById('lastUpdated').textContent =
       'Updated ' + new Date().toLocaleTimeString();
+    autoOpenWarm();
   } catch (e) {
-    document.getElementById('lastUpdated').textContent = 'Error loading data';
+    document.getElementById('lastUpdated').textContent = 'Error';
     document.getElementById('tableContainer').innerHTML =
       '<div class="loading" style="color:#ef4444">⚠ Could not load sheet data.<br><br>' +
       'Make sure the Google Sheet is published to web:<br>' +
       '<strong>File → Share → Publish to web → Entire Document → CSV → Publish</strong><br><br>' +
       '<small style="color:#7c7c96">' + e.message + '</small></div>';
-    document.getElementById('eventContainer').innerHTML = '';
     console.error(e);
   }
+}
+function renderAll() {
+  renderKPIs();
+  renderWarmLeads();
+  renderBooked();
+  renderEvents();
+  renderTable();
 }
 
 // ─── KPIs ────────────────────────────────────────────────────────────────────
 function renderKPIs() {
-  const sevenDaysAgo = new Date(Date.now() - 7 * 86400000).toISOString();
+  const r = currentRange();
+  const inR = e => inRange(e.TIMESTAMP, r);
+  const re = events.filter(inR);
 
   const active   = contacts.filter(c => c.STATUS === 'ACTIVE').length;
   const warm     = contacts.filter(c => c.STATUS === 'CALL_TRIGGERED').length;
   const cold     = contacts.filter(c => c.STATUS === 'COLD_NURTURE').length;
   const complete = contacts.filter(c => c.STATUS === 'COMPLETE').length;
+  const total    = contacts.length;
 
-  const recentEvents = events.filter(e => (e.TIMESTAMP || '') >= sevenDaysAgo);
-  const sent   = recentEvents.filter(e => e.EVENT_TYPE === 'EMAIL_SENT').length;
-  const opens  = recentEvents.filter(e => e.EVENT_TYPE === 'EMAIL_OPENED').length;
-  const clicks = recentEvents.filter(e => ['CTA_CLICK','LP_VISIT','EMAIL_CLICK'].includes(e.EVENT_TYPE)).length;
-  const booked = recentEvents.filter(e => ['BOOKED','CALENDLY_BOOKED','CALL_BOOKED'].includes(e.EVENT_TYPE)).length;
+  const sent    = re.filter(e => e.EVENT_TYPE === 'EMAIL_SENT').length;
+  const opens   = re.filter(e => e.EVENT_TYPE === 'EMAIL_OPENED').length;
+  const clicks  = re.filter(e => ['CTA_CLICK','EMAIL_CLICK'].includes(e.EVENT_TYPE)).length;
+  const lp      = re.filter(e => e.EVENT_TYPE === 'LP_VISIT').length;
+  const video   = re.filter(e => e.EVENT_TYPE === 'VIDEO_PLAYED').length;
+  const booked  = re.filter(e => ['BOOKED','CALENDLY_BOOKED','CALL_BOOKED'].includes(e.EVENT_TYPE)).length;
+  const rebound = re.filter(e => e.EVENT_TYPE === 'REBOUND_SENT').length;
 
-  const openRate  = sent > 0 ? Math.round(opens  / sent * 100) : 0;
-  const clickRate = sent > 0 ? Math.round(clicks / sent * 100) : 0;
+  const openRate  = sent > 0 ? Math.round(opens/sent*100) : 0;
+  const clickRate = sent > 0 ? Math.round(clicks/sent*100) : 0;
 
-  set('kpiActive',    active);
-  set('kpiSent',      sent);
-  set('kpiOpenRate',  openRate + '%');
-  set('kpiClickRate', clickRate + '%');
-  set('kpiWarm',      warm);
-  set('kpiBooked',    booked);
-  set('kpiCold',      cold);
-  set('kpiComplete',  complete);
+  setText('kpiActive', active);
+  setText('kpiSent', sent); setText('kpiSentSub', sent ? `in selected range` : '');
+  setText('kpiOpenRate', openRate + '%'); setText('kpiOpenSub', `${opens} opens`);
+  setText('kpiClickRate', clickRate + '%'); setText('kpiClickSub', `${clicks} clicks`);
+  setText('kpiLp', lp);
+  setText('kpiVideo', video);
+  setText('kpiWarm', warm);
+  setText('kpiBooked', booked);
+  setText('kpiRebound', rebound);
+  setText('kpiCold', cold);
+  setText('kpiComplete', complete);
+  setText('kpiTotal', total);
 }
-
-function set(id, val) {
-  const el = document.getElementById(id);
-  if (el) el.textContent = val;
+function setText(id, v) {
+  const el = document.getElementById(id); if (el) el.textContent = v;
 }
 
 // ─── WARM LEADS ──────────────────────────────────────────────────────────────
 function renderWarmLeads() {
   const warm = contacts.filter(c => c.STATUS === 'CALL_TRIGGERED');
-  document.getElementById('warmCount').textContent = warm.length;
-  const body  = document.getElementById('warmBody');
-  const empty = document.getElementById('warmEmpty');
+  setText('warmCount', warm.length);
+  const body = document.getElementById('warmBody');
+  if (!warm.length) { body.innerHTML = '<div class="no-warm">No warm leads right now.</div>'; return; }
 
-  if (warm.length === 0) {
-    empty.style.display = 'block';
-    return;
-  }
-  empty.style.display = 'none';
-
-  const items = warm.map(c => {
-    const triggerType = getTriggerType(c);
+  body.innerHTML = warm.map(c => {
+    const trig = getTrigger(c);
+    const name = getName(c);
     const lacrm = getLacrmLink(c);
-    return `
-    <div class="warm-item">
+    return `<div class="warm-item">
       <div class="warm-info">
-        <div class="warm-name">${escHtml(getName(c))}</div>
-        <div class="warm-email">${escHtml(c.EMAIL || '')}</div>
+        <div class="warm-name">${esc(name)}</div>
+        <div class="warm-email">${esc(c.EMAIL||'')}</div>
       </div>
-      <span class="warm-trigger ${triggerType.cls}">${triggerType.label}</span>
+      <span class="warm-trigger ${trig.cls}">${trig.label}</span>
       <div class="warm-meta">
-        <div>${escHtml(c.SEQUENCE || 'PP1')} · Step ${escHtml(c.STEP || '1')}</div>
-        <div style="margin-top:4px;">Opens: ${c.OPEN_COUNT||0} · Clicks: ${c.LP_CLICK_COUNT||0}</div>
+        <div>${esc(c.SEQUENCE||'PP1')} · Step ${esc(c.STEP||'1')}</div>
+        <div style="margin-top:3px;">Opens: ${c.OPEN_COUNT||0} · LP: ${c.LP_CLICK_COUNT||0}</div>
       </div>
-      ${lacrm ? `<a class="open-profile-btn" href="${lacrm}" target="_blank">↗ Open Profile</a>` : ''}
+      ${lacrm ? `<a class="open-profile-btn" href="${lacrm}" target="_blank">↗ Profile</a>` : ''}
     </div>`;
   }).join('');
-
-  body.innerHTML = items + `<div id="warmEmpty" class="no-warm" style="display:none"></div>`;
 }
-
-function getTriggerType(c) {
-  if ((parseInt(c.VIDEO_CLICK) > 0) || c.VIDEO_CLICK === 'TRUE')
-    return { cls: 'trigger-video', label: '▶ Video Played' };
+function getTrigger(c) {
+  if (c.VIDEO_CLICK==='TRUE' || parseInt(c.VIDEO_CLICK)>0)
+    return { cls:'trigger-video', label:'▶ Video Played' };
   if (parseInt(c.LP_CLICK_COUNT) >= 2)
-    return { cls: 'trigger-lp',    label: '🔗 2× LP Click' };
+    return { cls:'trigger-lp', label:'🔗 2× LP Visit' };
   if (parseInt(c.CLICK_COUNT) >= 2)
-    return { cls: 'trigger-cta',   label: '🎯 2× CTA Click' };
+    return { cls:'trigger-cta', label:'🎯 2× CTA Click' };
   if (parseInt(c.OPEN_COUNT) >= 3)
-    return { cls: 'trigger-open',  label: '👁 3× Opens' };
-  return { cls: 'trigger-lp', label: 'Warm Lead' };
+    return { cls:'trigger-open', label:'👁 3× Opens' };
+  return { cls:'trigger-lp', label:'Warm Lead' };
 }
-
-// LACRM contact link — pulled from events log if stored, else search by email
-function getLacrmLink(c) {
-  const ev = events.find(e => e.EMAIL === c.EMAIL && e.LACRM_ID);
-  if (ev && ev.LACRM_ID)
-    return `https://account.lessannoyingcrm.com/app/View_Contact?ContactId=${ev.LACRM_ID}`;
-  // Fallback: LACRM search by email
-  return `https://account.lessannoyingcrm.com/app/Search?q=${encodeURIComponent(c.EMAIL||'')}`;
-}
-
-function getName(c) {
-  const ev = events.find(e => e.EMAIL === c.EMAIL && e.FULL_NAME);
-  return ev ? ev.FULL_NAME : (c.EMAIL || '').split('@')[0];
-}
-
 function toggleWarm() {
-  const body    = document.getElementById('warmBody');
-  const chevron = document.getElementById('warmChevron');
-  body.classList.toggle('open');
-  chevron.classList.toggle('open');
+  document.getElementById('warmBody').classList.toggle('open');
+  document.getElementById('warmChevron').classList.toggle('open');
 }
-
-// Auto-open warm panel if there are leads
 function autoOpenWarm() {
-  const warm = contacts.filter(c => c.STATUS === 'CALL_TRIGGERED');
-  if (warm.length > 0) {
+  if (contacts.some(c => c.STATUS === 'CALL_TRIGGERED')) {
     document.getElementById('warmBody').classList.add('open');
     document.getElementById('warmChevron').classList.add('open');
   }
 }
 
+// ─── CALLS BOOKED ────────────────────────────────────────────────────────────
+function setBookedFilter(mode) {
+  bookedMode = mode;
+  document.querySelectorAll('.booked-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  renderBooked();
+}
+function renderBooked() {
+  const r = rangeFor(bookedMode);
+  const booked = events.filter(e =>
+    ['BOOKED','CALENDLY_BOOKED','CALL_BOOKED'].includes(e.EVENT_TYPE) &&
+    inRange(e.TIMESTAMP, r)
+  ).sort((a,b) => b.TIMESTAMP.localeCompare(a.TIMESTAMP));
+
+  const cont = document.getElementById('bookedContainer');
+  if (!booked.length) {
+    cont.innerHTML = '<div class="no-warm">No calls booked in this period.</div>';
+    return;
+  }
+  cont.innerHTML = booked.map(e => {
+    const ts   = e.TIMESTAMP ? new Date(e.TIMESTAMP).toLocaleString('en-CA', {month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}) : '';
+    const name = e.FULL_NAME || (e.EMAIL||'').split('@')[0];
+    const isNathan = (e.DETAIL||'').toLowerCase().includes('nathan');
+    return `<div class="booked-item">
+      <div class="booked-avatar">📅</div>
+      <div class="booked-info">
+        <div class="booked-name">${esc(name)}</div>
+        <div class="booked-email">${esc(e.EMAIL||'')}</div>
+      </div>
+      <div class="booked-meta">
+        <div><span class="booked-rep ${isNathan?'rep-nathan':'rep-richie'}">${isNathan?'Nathan':'Richie'}</span></div>
+        <div style="margin-top:4px;">${esc(ts)}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
 // ─── CONTACT TABLE ───────────────────────────────────────────────────────────
 function renderTable() {
-  const search  = (document.getElementById('searchInput').value || '').toLowerCase();
-  const status  = document.getElementById('statusFilter').value;
-  const seq     = document.getElementById('seqFilter').value;
+  const search = (document.getElementById('searchInput').value||'').toLowerCase();
+  const status = document.getElementById('statusFilter').value;
+  const seq    = document.getElementById('seqFilter').value;
 
   let filtered = contacts.filter(c => {
-    if (search && !(c.EMAIL||'').toLowerCase().includes(search)) return false;
+    const name = getName(c).toLowerCase();
+    const email = (c.EMAIL||'').toLowerCase();
+    if (search && !email.includes(search) && !name.includes(search)) return false;
     if (status && c.STATUS !== status) return false;
-    if (seq    && (c.SEQUENCE||'PP1') !== seq) return false;
+    if (seq && (c.SEQUENCE||'PP1') !== seq) return false;
     return true;
   });
 
-  document.getElementById('contactCount').textContent = filtered.length;
+  setText('contactCount', filtered.length);
 
-  if (filtered.length === 0) {
+  // Summary stats
+  const activeN  = filtered.filter(c => c.STATUS==='ACTIVE').length;
+  const warmN    = filtered.filter(c => c.STATUS==='CALL_TRIGGERED').length;
+  const totalOpen = filtered.reduce((s,c) => s + (parseInt(c.OPEN_COUNT)||0), 0);
+  document.getElementById('tableStats').textContent =
+    `Active: ${activeN} · Warm: ${warmN} · Total opens: ${totalOpen}`;
+
+  if (!filtered.length) {
     document.getElementById('tableContainer').innerHTML =
       '<div class="loading">No contacts match the filter.</div>';
     return;
   }
 
   const rows = filtered.map(c => {
-    const seq  = c.SEQUENCE || 'PP1';
+    const seqV = c.SEQUENCE || 'PP1';
     const stat = c.STATUS || 'ACTIVE';
     const lacrm = getLacrmLink(c);
-    return `<tr>
-      <td class="email-cell">${escHtml(c.EMAIL||'')}</td>
-      <td><span class="seq-badge ${seq.toLowerCase()}">${escHtml(seq)}</span></td>
-      <td>${escHtml(c.STEP||'1')}</td>
+    const name  = getName(c);
+    const isExpanded = expandedRows.has(c.EMAIL);
+    const contactEvts = events
+      .filter(e => e.EMAIL === c.EMAIL)
+      .sort((a,b) => b.TIMESTAMP.localeCompare(a.TIMESTAMP));
+    const opens   = contactEvts.filter(e=>e.EVENT_TYPE==='EMAIL_OPENED').length;
+    const clicks  = contactEvts.filter(e=>['CTA_CLICK','EMAIL_CLICK'].includes(e.EVENT_TYPE)).length;
+    const lpV     = contactEvts.filter(e=>e.EVENT_TYPE==='LP_VISIT').length;
+    const videoV  = contactEvts.filter(e=>e.EVENT_TYPE==='VIDEO_PLAYED').length;
+    const rebV    = contactEvts.filter(e=>e.EVENT_TYPE==='REBOUND_SENT').length;
+    const callT   = contactEvts.filter(e=>e.EVENT_TYPE==='CALL_TRIGGERED').length;
+    const hasEvent = opens||clicks||lpV||videoV||rebV||callT;
+
+    const tlRows = contactEvts.slice(0,20).map(e => {
+      const ts = e.TIMESTAMP ? new Date(e.TIMESTAMP).toLocaleString('en-CA',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}) : '';
+      const cls = typeClass(e.EVENT_TYPE);
+      return `<div class="tl-item">
+        <div class="tl-time">${esc(ts)}</div>
+        <span class="tl-type log-type ${cls}">${esc(e.EVENT_TYPE.replace(/_/g,' '))}</span>
+        <div class="tl-detail">${esc(e.DETAIL||'')}${e.SEQUENCE?` · ${e.SEQUENCE} Step ${e.STEP||''}`:''}${e.FULL_NAME&&!e.DETAIL?` ${e.FULL_NAME}`:''}</div>
+      </div>`;
+    }).join('');
+
+    return `<tr class="contact-row" onclick="toggleExpand('${esc(c.EMAIL)}')">
+      <td>
+        <div class="email-cell">${esc(c.EMAIL||'')}</div>
+        ${name !== (c.EMAIL||'').split('@')[0] ? `<div class="contact-name">${esc(name)}</div>` : ''}
+      </td>
+      <td><span class="seq-badge ${seqV.toLowerCase()}">${esc(seqV)}</span></td>
+      <td>${esc(c.STEP||'1')}</td>
       <td>
         <span class="status-dot ${statusDot(stat)}"></span>
-        ${escHtml(stat.replace('_',' '))}
+        ${esc(stat.replace(/_/g,' '))}
       </td>
       <td>
         <div class="stat-pills">
-          ${c.OPEN_COUNT     ? `<span class="pill pill-opens">👁 ${c.OPEN_COUNT}</span>` : ''}
-          ${c.CLICK_COUNT    ? `<span class="pill pill-clicks">🔗 ${c.CLICK_COUNT}</span>` : ''}
-          ${c.LP_CLICK_COUNT ? `<span class="pill pill-lp">LP ${c.LP_CLICK_COUNT}</span>` : ''}
-          ${(c.VIDEO_CLICK==='TRUE'||parseInt(c.VIDEO_CLICK)>0) ? `<span class="pill pill-video">▶</span>` : ''}
+          ${c.OPEN_COUNT && c.OPEN_COUNT!=='0' ? `<span class="pill pill-opens">👁 ${c.OPEN_COUNT}</span>` : ''}
+          ${c.CLICK_COUNT && c.CLICK_COUNT!=='0' ? `<span class="pill pill-clicks">🎯 ${c.CLICK_COUNT}</span>` : ''}
+          ${c.LP_CLICK_COUNT && c.LP_CLICK_COUNT!=='0' ? `<span class="pill pill-lp">LP ${c.LP_CLICK_COUNT}</span>` : ''}
+          ${(c.VIDEO_CLICK==='TRUE'||parseInt(c.VIDEO_CLICK)>0) ? `<span class="pill pill-video">▶ Video</span>` : ''}
+          ${c.REBOUND_SENT==='TRUE' ? `<span class="pill pill-rebound">Rebound</span>` : ''}
         </div>
       </td>
-      <td>${escHtml(c.NEXT_SEND_DATE||'')}</td>
-      <td>${lacrm ? `<a class="profile-link" href="${lacrm}" target="_blank">↗ LACRM</a>` : ''}</td>
+      <td>${esc(c.NEXT_SEND_DATE||'')}</td>
+      <td style="display:flex;align-items:center;gap:8px;">
+        ${lacrm ? `<a class="profile-link" href="${lacrm}" target="_blank" onclick="event.stopPropagation()">↗ LACRM</a>` : ''}
+        ${hasEvent ? `<span class="expand-chevron${isExpanded?' open':''}">▼</span>` : ''}
+      </td>
+    </tr>
+    <tr class="expand-row">
+      <td colspan="7">
+        <div class="expand-panel${isExpanded?' open':''}" id="expand-${btoa(c.EMAIL).replace(/[^a-zA-Z0-9]/g,'')}">
+          <div class="expand-inner">
+            <div class="contact-stats">
+              <div class="c-stat"><div class="c-stat-label">Opens</div><div class="c-stat-val yellow">${opens||0}</div></div>
+              <div class="c-stat"><div class="c-stat-label">CTA Clicks</div><div class="c-stat-val purple">${clicks||0}</div></div>
+              <div class="c-stat"><div class="c-stat-label">LP Visits</div><div class="c-stat-val green">${lpV||0}</div></div>
+              <div class="c-stat"><div class="c-stat-label">Video Plays</div><div class="c-stat-val orange">${videoV||0}</div></div>
+              <div class="c-stat"><div class="c-stat-label">Rebound Sent</div><div class="c-stat-val red">${rebV||0}</div></div>
+              <div class="c-stat"><div class="c-stat-label">Call Triggers</div><div class="c-stat-val orange">${callT||0}</div></div>
+            </div>
+            <div class="timeline-title">Event Timeline</div>
+            ${contactEvts.length ? tlRows : '<div class="timeline-empty">No events logged for this contact yet.</div>'}
+          </div>
+        </div>
+      </td>
     </tr>`;
   }).join('');
 
@@ -687,83 +921,99 @@ function renderTable() {
     <table>
       <thead>
         <tr>
-          <th>Email</th><th>Sequence</th><th>Step</th><th>Status</th>
-          <th>Engagement</th><th>Next Send</th><th>Profile</th>
+          <th>Email / Name</th><th>Sequence</th><th>Step</th><th>Status</th>
+          <th>Engagement</th><th>Next Send</th><th>Actions</th>
         </tr>
       </thead>
       <tbody>${rows}</tbody>
     </table>`;
 }
 
+function toggleExpand(email) {
+  const id = 'expand-' + btoa(email).replace(/[^a-zA-Z0-9]/g,'');
+  const panel = document.getElementById(id);
+  if (!panel) return;
+  const isOpen = panel.classList.contains('open');
+  if (isOpen) {
+    expandedRows.delete(email);
+    panel.classList.remove('open');
+  } else {
+    expandedRows.add(email);
+    panel.classList.add('open');
+  }
+  // flip chevron
+  const rows = document.querySelectorAll('.contact-row');
+  rows.forEach(row => {
+    const emailCell = row.querySelector('.email-cell');
+    if (emailCell && emailCell.textContent.trim() === email) {
+      const chev = row.querySelector('.expand-chevron');
+      if (chev) chev.classList.toggle('open');
+    }
+  });
+}
+
 function statusDot(s) {
-  const map = {
-    ACTIVE: 'dot-active', REBOUND_PENDING: 'dot-rebound',
-    CALL_TRIGGERED: 'dot-call', COLD_NURTURE: 'dot-cold',
-    COMPLETE: 'dot-complete', REMOVED: 'dot-removed'
-  };
-  return map[s] || 'dot-active';
+  return { ACTIVE:'dot-active', REBOUND_PENDING:'dot-rebound', CALL_TRIGGERED:'dot-call',
+    COLD_NURTURE:'dot-cold', COMPLETE:'dot-complete', REMOVED:'dot-removed' }[s] || 'dot-active';
 }
 
 // ─── EVENT LOG ───────────────────────────────────────────────────────────────
 function renderEvents() {
-  const recent = [...events]
-    .sort((a, b) => (b.TIMESTAMP||'').localeCompare(a.TIMESTAMP||''))
-    .slice(0, 50);
+  const r = currentRange();
+  const typeF = document.getElementById('eventTypeFilter').value;
+  let evts = events
+    .filter(e => inRange(e.TIMESTAMP, r))
+    .filter(e => !typeF || e.EVENT_TYPE === typeF)
+    .sort((a,b) => b.TIMESTAMP.localeCompare(a.TIMESTAMP))
+    .slice(0, 60);
 
-  document.getElementById('eventCount').textContent = recent.length;
-
-  if (recent.length === 0) {
-    document.getElementById('eventContainer').innerHTML =
-      '<div class="no-warm">No events logged yet. Events appear here once the Dashboard Events tab is populated by N8N.</div>';
+  setText('eventCount', evts.length);
+  const cont = document.getElementById('eventContainer');
+  if (!evts.length) {
+    cont.innerHTML = '<div class="no-warm">No events in this range.</div>';
     return;
   }
-
-  const rows = recent.map(e => {
-    const ts   = e.TIMESTAMP ? new Date(e.TIMESTAMP).toLocaleString() : '';
-    const type = e.EVENT_TYPE || '';
-    const cls  = typeClass(type);
+  cont.innerHTML = evts.map(e => {
+    const ts  = e.TIMESTAMP ? new Date(e.TIMESTAMP).toLocaleString('en-CA',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}) : '';
+    const cls = typeClass(e.EVENT_TYPE);
     return `<div class="log-item">
-      <span class="log-time">${escHtml(ts.split(',')[1]?.trim() || ts)}</span>
-      <span class="log-type ${cls}">${escHtml(type.replace('_',' '))}</span>
-      <span class="log-email">${escHtml(e.EMAIL||'')}</span>
-      <span class="log-detail">${escHtml(e.DETAIL||'')} ${e.SEQUENCE ? `· ${e.SEQUENCE} Step ${e.STEP||''}` : ''}</span>
+      <span class="log-time">${esc(ts)}</span>
+      <span class="log-type ${cls}">${esc((e.EVENT_TYPE||'').replace(/_/g,' '))}</span>
+      <span class="log-email">${esc(e.EMAIL||'')}</span>
+      <span class="log-detail">${esc(e.DETAIL||'')}${e.SEQUENCE?` · ${e.SEQUENCE} S${e.STEP||''}`:''}</span>
     </div>`;
   }).join('');
-
-  document.getElementById('eventContainer').innerHTML = rows;
 }
 
 function typeClass(t) {
-  const map = {
-    EMAIL_SENT:      'type-sent',
-    EMAIL_OPENED:    'type-open',
-    EMAIL_OPEN:      'type-open',
-    EMAIL_CLICK:     'type-click',
-    LP_VISIT:        'type-lp',
-    LP_VISITED:      'type-lp',
-    CTA_CLICK:       'type-cta',
-    VIDEO_PLAY:      'type-video',
-    VIDEO_PLAYED:    'type-video',
-    REBOUND_SENT:    'type-cta',
-    CALL_TRIGGERED:  'type-trigger',
-    BOOKED:          'type-trigger',
-    CALENDLY_BOOKED: 'type-trigger',
-    CALL_BOOKED:     'type-trigger',
-  };
-  return map[t] || 'type-sent';
+  return {
+    EMAIL_SENT:'type-sent', EMAIL_OPENED:'type-open', EMAIL_OPEN:'type-open',
+    EMAIL_CLICK:'type-click', LP_VISIT:'type-lp', LP_VISITED:'type-lp',
+    CTA_CLICK:'type-cta', VIDEO_PLAY:'type-video', VIDEO_PLAYED:'type-video',
+    REBOUND_SENT:'type-cta', CALL_TRIGGERED:'type-trigger',
+    BOOKED:'type-booked', CALENDLY_BOOKED:'type-booked', CALL_BOOKED:'type-booked',
+  }[t] || 'type-sent';
 }
 
 // ─── UTILS ───────────────────────────────────────────────────────────────────
-function escHtml(s) {
+function getName(c) {
+  const ev = events.find(e => e.EMAIL === c.EMAIL && e.FULL_NAME);
+  return (ev && ev.FULL_NAME) ? ev.FULL_NAME : (c.EMAIL||'').split('@')[0];
+}
+function getLacrmLink(c) {
+  const ev = events.find(e => e.EMAIL === c.EMAIL && e.LACRM_ID);
+  if (ev && ev.LACRM_ID)
+    return `https://account.lessannoyingcrm.com/app/View_Contact?ContactId=${ev.LACRM_ID}`;
+  return `https://account.lessannoyingcrm.com/app/Search?q=${encodeURIComponent(c.EMAIL||'')}`;
+}
+function esc(s) {
   return String(s||'')
     .replace(/&/g,'&amp;').replace(/</g,'&lt;')
     .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 // ─── INIT ────────────────────────────────────────────────────────────────────
-loadAll().then(autoOpenWarm);
-
-// Auto-refresh every 5 minutes
+loadAll();
 setInterval(loadAll, 5 * 60 * 1000);
 </script>
 </body>
