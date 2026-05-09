@@ -696,7 +696,7 @@ function renderKPIs() {
   const inR = e => inRange(e.TIMESTAMP, r);
   const re = events.filter(inR);
 
-  const active   = contacts.filter(c => c.STATUS === 'ACTIVE').length;
+  const active   = contacts.filter(c => (c.STATUS || 'ACTIVE') === 'ACTIVE').length;
   const warm     = contacts.filter(c => c.STATUS === 'CALL_TRIGGERED').length;
   const cold     = contacts.filter(c => c.STATUS === 'COLD_NURTURE').length;
   const complete = contacts.filter(c => c.STATUS === 'COMPLETE').length;
@@ -832,7 +832,7 @@ function renderTable() {
   setText('contactCount', filtered.length);
 
   // Summary stats
-  const activeN  = filtered.filter(c => c.STATUS==='ACTIVE').length;
+  const activeN  = filtered.filter(c => (c.STATUS||'ACTIVE')==='ACTIVE').length;
   const warmN    = filtered.filter(c => c.STATUS==='CALL_TRIGGERED').length;
   const totalOpen = filtered.reduce((s,c) => s + (parseInt(c.OPEN_COUNT)||0), 0);
   document.getElementById('tableStats').textContent =
