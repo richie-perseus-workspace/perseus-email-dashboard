@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Perseus — Email Sequence Dashboard</title>
+  <style>
+    :root {
+      --purple:      #6938ef;
+      --purple-dim:  #4f28c7;
+      --purple-glow: rgba(105,56,239,0.18);
+      --bg:          #0d0d0f;
+      --bg2:         #131318;
+      --bg3:         #1a1a24;
+      --border:      rgba(255,255,255,0.07);
+      --text:        #e8e8f0;
+      --muted:       #7c7c96;
+      --green:       #22c55e;
+      --orange:      #f97316;
+      --red:         #ef4444;
+      --yellow:      #eab308;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+      font-size: 14px;
+      min-height: 100vh;
+    }
+
+    /* ── Top Bar ───────────────────────────────────────────── */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 32px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg2);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .logo {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: #fff;
+    }
+    .logo span { color: var(--purple); }
+    .refresh-btn {
+      background: var(--purple);
+      border: none;
+      color: #fff;
+      padding: 8px 18px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+    .refresh-btn:hover { background: var(--purple-dim); }
+    .last-updated { color: var(--muted); font-size: 12px; }
+
+    /* ── Layout ────────────────────────────────────────────── */
+    .main { padding: 28px 32px; max-width: 1400px; margin: 0 auto; }
+
+    /* ── KPI Cards ─────────────────────────────────────────── */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .kpi {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px 18px;
+    }
+    .kpi-label { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; }
+    .kpi-value { font-size: 28px; font-weight: 700; color: #fff; line-height: 1; }
+    .kpi-value.green  { color: var(--green); }
+    .kpi-value.orange { color: var(--orange); }
+    .kpi-value.purple { color: var(--purple); }
+    .kpi-sub { color: var(--muted); font-size: 11px; margin-top: 6px; }
+
+    /* ── Section Headers ───────────────────────────────────── */
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .section-header h2 {
+      font-size: 15px;
+      font-weight: 600;
+      color: #fff;
+    }
+    .badge {
+      background: var(--purple-glow);
+      border: 1px solid rgba(105,56,239,0.3);
+      color: var(--purple);
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    /* ── Warm Leads Panel ──────────────────────────────────── */
+    .warm-panel {
+      background: var(--bg2);
+      border: 1px solid rgba(249,115,22,0.25);
+      border-radius: 10px;
+      margin-bottom: 28px;
+      overflow: hidden;
+    }
+    .warm-panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      user-select: none;
+    }
+    .warm-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--orange);
+    }
+    .fire-dot {
+      width: 8px; height: 8px;
+      background: var(--orange);
+      border-radius: 50%;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.5; transform: scale(1.3); }
+    }
+    .chevron { color: var(--muted); font-size: 16px; transition: transform 0.2s; }
+    .chevron.open { transform: rotate(180deg); }
+    .warm-body { display: none; }
+    .warm-body.open { display: block; }
+
+    .warm-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      border-bottom: 1px solid var(--border);
+      gap: 12px;
+    }
+    .warm-item:last-child { border-bottom: none; }
+    .warm-info { flex: 1; min-width: 0; }
+    .warm-name { font-weight: 600; color: #fff; font-size: 13px; }
+    .warm-email { color: var(--muted); font-size: 12px; margin-top: 2px; }
+    .warm-trigger {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .trigger-lp    { background: rgba(105,56,239,0.15); color: #a78bfa; }
+    .trigger-cta   { background: rgba(249,115,22,0.15); color: var(--orange); }
+    .trigger-video { background: rgba(34,197,94,0.12);  color: var(--green); }
+    .trigger-open  { background: rgba(234,179,8,0.12);  color: var(--yellow); }
+
+    .warm-meta { color: var(--muted); font-size: 11px; text-align: right; }
+    .open-profile-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: transparent;
+      border: 1px solid rgba(105,56,239,0.4);
+      color: var(--purple);
+      padding: 5px 12px;
+      border-radius: 5px;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 600;
+      transition: background 0.2s, border-color 0.2s;
+      white-space: nowrap;
+    }
+    .open-profile-btn:hover {
+      background: var(--purple-glow);
+      border-color: var(--purple);
+    }
+
+    .no-warm {
+      padding: 24px 20px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    /* ── Contact Table ─────────────────────────────────────── */
+    .table-wrap {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 28px;
+    }
+    .table-controls {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .search-input {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      padding: 7px 12px;
+      font-size: 13px;
+      width: 220px;
+      outline: none;
+    }
+    .search-input:focus { border-color: var(--purple); }
+    .filter-select {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      padding: 7px 10px;
+      font-size: 13px;
+      outline: none;
+      cursor: pointer;
+    }
+    .filter-select:focus { border-color: var(--purple); }
+
+    table { width: 100%; border-collapse: collapse; }
+    thead th {
+      padding: 10px 16px;
+      text-align: left;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background 0.15s;
+    }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: rgba(255,255,255,0.025); }
+    td {
+      padding: 11px 16px;
+      font-size: 13px;
+      vertical-align: middle;
+    }
+    .email-cell { font-weight: 500; color: #fff; }
+    .seq-badge {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .pp1 { background: rgba(105,56,239,0.15); color: #a78bfa; }
+    .pp2 { background: rgba(34,197,94,0.12);  color: var(--green); }
+    .pp3 { background: rgba(249,115,22,0.12); color: var(--orange); }
+    .pp4 { background: rgba(234,179,8,0.12);  color: var(--yellow); }
+
+    .status-dot {
+      display: inline-block;
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      margin-right: 6px;
+    }
+    .dot-active   { background: var(--green); }
+    .dot-rebound  { background: var(--yellow); }
+    .dot-call     { background: var(--orange); animation: pulse 1.5s infinite; }
+    .dot-cold     { background: var(--muted); }
+    .dot-complete { background: #4ade80; }
+    .dot-removed  { background: var(--red); }
+
+    .stat-pills { display: flex; gap: 4px; flex-wrap: wrap; }
+    .pill {
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .pill-opens  { background: rgba(234,179,8,0.12);  color: var(--yellow); }
+    .pill-clicks { background: rgba(105,56,239,0.15); color: #a78bfa; }
+    .pill-lp     { background: rgba(34,197,94,0.12);  color: var(--green); }
+    .pill-video  { background: rgba(249,115,22,0.12); color: var(--orange); }
+
+    .profile-link {
+      color: var(--purple);
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border: 1px solid rgba(105,56,239,0.3);
+      border-radius: 4px;
+      transition: background 0.2s;
+    }
+    .profile-link:hover { background: var(--purple-glow); }
+
+    /* ── Event Log ─────────────────────────────────────────── */
+    .event-log {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 28px;
+    }
+    .log-header {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      font-weight: 600;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .log-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 10px 20px;
+      border-bottom: 1px solid var(--border);
+      font-size: 12px;
+    }
+    .log-item:last-child { border-bottom: none; }
+    .log-time { color: var(--muted); white-space: nowrap; min-width: 80px; }
+    .log-type {
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 10px;
+      white-space: nowrap;
+    }
+    .type-sent    { background: rgba(105,56,239,0.15); color: #a78bfa; }
+    .type-open    { background: rgba(234,179,8,0.12);  color: var(--yellow); }
+    .type-click   { background: rgba(34,197,94,0.12);  color: var(--green); }
+    .type-lp      { background: rgba(34,197,94,0.12);  color: var(--green); }
+    .type-cta     { background: rgba(249,115,22,0.12); color: var(--orange); }
+    .type-video   { background: rgba(249,115,22,0.12); color: var(--orange); }
+    .type-trigger { background: rgba(239,68,68,0.12);  color: var(--red); }
+    .log-email { color: #fff; font-weight: 500; }
+    .log-detail { color: var(--muted); flex: 1; }
+
+    /* ── Loading / Error states ────────────────────────────── */
+    .loading { padding: 40px; text-align: center; color: var(--muted); }
+    .spinner {
+      width: 24px; height: 24px;
+      border: 2px solid var(--border);
+      border-top-color: var(--purple);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin: 0 auto 12px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Responsive ────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .main { padding: 16px; }
+      .topbar { padding: 14px 16px; }
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+      .search-input { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Top Bar -->
+<div class="topbar">
+  <div class="logo"><span>Perseus</span> &nbsp;Email Dashboard</div>
+  <div style="display:flex;align-items:center;gap:16px;">
+    <span class="last-updated" id="lastUpdated">Not loaded</span>
+    <button class="refresh-btn" onclick="loadAll()">↻ Refresh</button>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- KPI Grid -->
+  <div class="kpi-grid" id="kpiGrid">
+    <div class="kpi"><div class="kpi-label">Active Contacts</div><div class="kpi-value purple" id="kpiActive">—</div></div>
+    <div class="kpi"><div class="kpi-label">Emails Sent (7d)</div><div class="kpi-value" id="kpiSent">—</div></div>
+    <div class="kpi"><div class="kpi-label">Open Rate (7d)</div><div class="kpi-value green" id="kpiOpenRate">—</div></div>
+    <div class="kpi"><div class="kpi-label">Click Rate (7d)</div><div class="kpi-value green" id="kpiClickRate">—</div></div>
+    <div class="kpi"><div class="kpi-label">Warm Leads</div><div class="kpi-value orange" id="kpiWarm">—</div></div>
+    <div class="kpi"><div class="kpi-label">Calls Booked (7d)</div><div class="kpi-value green" id="kpiBooked">—</div></div>
+    <div class="kpi"><div class="kpi-label">Cold Nurture</div><div class="kpi-value" id="kpiCold">—</div></div>
+    <div class="kpi"><div class="kpi-label">Completed</div><div class="kpi-value" id="kpiComplete">—</div></div>
+  </div>
+
+  <!-- Warm Leads Dropdown -->
+  <div class="warm-panel">
+    <div class="warm-panel-header" onclick="toggleWarm()">
+      <div class="warm-title">
+        <div class="fire-dot"></div>
+        🔥 Warm Leads — Call Now
+        <span class="badge" id="warmCount">0</span>
+      </div>
+      <span class="chevron" id="warmChevron">▼</span>
+    </div>
+    <div class="warm-body" id="warmBody">
+      <div class="no-warm" id="warmEmpty">No warm leads right now.</div>
+    </div>
+  </div>
+
+  <!-- Contact Table -->
+  <div class="table-wrap">
+    <div class="table-controls">
+      <div class="section-header" style="margin:0;">
+        <h2>All Contacts</h2>
+        <span class="badge" id="contactCount">0</span>
+      </div>
+      <input class="search-input" id="searchInput" placeholder="Search email…" oninput="renderTable()" />
+      <select class="filter-select" id="statusFilter" onchange="renderTable()">
+        <option value="">All Statuses</option>
+        <option value="ACTIVE">Active</option>
+        <option value="CALL_TRIGGERED">Call Triggered</option>
+        <option value="REBOUND_PENDING">Rebound Pending</option>
+        <option value="COLD_NURTURE">Cold Nurture</option>
+        <option value="COMPLETE">Complete</option>
+        <option value="REMOVED">Removed</option>
+      </select>
+      <select class="filter-select" id="seqFilter" onchange="renderTable()">
+        <option value="">All Sequences</option>
+        <option value="PP1">PP1 — Repeating Tasks</option>
+        <option value="PP2">PP2 — Shouldering Accountability</option>
+        <option value="PP3">PP3 — Flying Blind</option>
+        <option value="PP4">PP4 — Not Empowered</option>
+      </select>
+    </div>
+    <div id="tableContainer">
+      <div class="loading"><div class="spinner"></div>Loading…</div>
+    </div>
+  </div>
+
+  <!-- Recent Events -->
+  <div class="event-log">
+    <div class="log-header">
+      <span>Recent Events</span>
+      <span class="badge" id="eventCount">0</span>
+    </div>
+    <div id="eventContainer">
+      <div class="loading"><div class="spinner"></div>Loading…</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ─── CONFIG ─────────────────────────────────────────────────────────────────
+// Replace SHEET_ID and API_KEY with your values.
+// The sheet must be published or use a service account key for private sheets.
+// Easiest option: publish the sheet to web (read-only) and use the CSV export URLs.
+
+const PUBLISHED_BASE = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTaqValm0L1uEK6jU32dy1nh-YaFjIEjrtItfLBW_BirVfxoq6B7KmAsJsPM6f2JdXpqMAwDzJJnO3W/pub?output=csv';
+
+const QUEUE_URL = PUBLISHED_BASE + '&gid=0';
+const EVENT_URL = PUBLISHED_BASE + '&gid=523108680';
+
+// ─── STATE ───────────────────────────────────────────────────────────────────
+let contacts = [];
+let events   = [];
+
+// ─── FETCH + PARSE CSV ───────────────────────────────────────────────────────
+async function fetchCSV(url) {
+  const res = await fetch(url + '&t=' + Date.now()); // bust cache
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const text = await res.text();
+  return parseCSV(text);
+}
+
+function parseCSV(text) {
+  const lines = text.trim().split('\n');
+  if (lines.length < 2) return [];
+  const headers = lines[0].split(',').map(h => h.replace(/^"|"$/g, '').trim());
+  return lines.slice(1).map(line => {
+    // Handle quoted fields with commas
+    const values = [];
+    let cur = '', inQ = false;
+    for (const ch of line) {
+      if (ch === '"') { inQ = !inQ; continue; }
+      if (ch === ',' && !inQ) { values.push(cur.trim()); cur = ''; continue; }
+      cur += ch;
+    }
+    values.push(cur.trim());
+    const obj = {};
+    headers.forEach((h, i) => { obj[h] = values[i] || ''; });
+    return obj;
+  });
+}
+
+// ─── LOAD ALL DATA ───────────────────────────────────────────────────────────
+async function loadAll() {
+  document.getElementById('lastUpdated').textContent = 'Loading…';
+  try {
+    [contacts, events] = await Promise.all([
+      fetchCSV(QUEUE_URL),
+      fetchCSV(EVENT_URL).catch(() => []), // Events tab may not exist yet
+    ]);
+    renderKPIs();
+    renderWarmLeads();
+    renderTable();
+    renderEvents();
+    document.getElementById('lastUpdated').textContent =
+      'Updated ' + new Date().toLocaleTimeString();
+  } catch (e) {
+    document.getElementById('lastUpdated').textContent = 'Error loading data';
+    document.getElementById('tableContainer').innerHTML =
+      '<div class="loading" style="color:#ef4444">⚠ Could not load sheet data.<br><br>' +
+      'Make sure the Google Sheet is published to web:<br>' +
+      '<strong>File → Share → Publish to web → Entire Document → CSV → Publish</strong><br><br>' +
+      '<small style="color:#7c7c96">' + e.message + '</small></div>';
+    document.getElementById('eventContainer').innerHTML = '';
+    console.error(e);
+  }
+}
+
+// ─── KPIs ────────────────────────────────────────────────────────────────────
+function renderKPIs() {
+  const sevenDaysAgo = new Date(Date.now() - 7 * 86400000).toISOString();
+
+  const active   = contacts.filter(c => c.STATUS === 'ACTIVE').length;
+  const warm     = contacts.filter(c => c.STATUS === 'CALL_TRIGGERED').length;
+  const cold     = contacts.filter(c => c.STATUS === 'COLD_NURTURE').length;
+  const complete = contacts.filter(c => c.STATUS === 'COMPLETE').length;
+
+  const recentEvents = events.filter(e => (e.TIMESTAMP || '') >= sevenDaysAgo);
+  const sent   = recentEvents.filter(e => e.EVENT_TYPE === 'EMAIL_SENT').length;
+  const opens  = recentEvents.filter(e => e.EVENT_TYPE === 'EMAIL_OPENED').length;
+  const clicks = recentEvents.filter(e => ['CTA_CLICK','LP_VISIT','EMAIL_CLICK'].includes(e.EVENT_TYPE)).length;
+  const booked = recentEvents.filter(e => ['BOOKED','CALENDLY_BOOKED','CALL_BOOKED'].includes(e.EVENT_TYPE)).length;
+
+  const openRate  = sent > 0 ? Math.round(opens  / sent * 100) : 0;
+  const clickRate = sent > 0 ? Math.round(clicks / sent * 100) : 0;
+
+  set('kpiActive',    active);
+  set('kpiSent',      sent);
+  set('kpiOpenRate',  openRate + '%');
+  set('kpiClickRate', clickRate + '%');
+  set('kpiWarm',      warm);
+  set('kpiBooked',    booked);
+  set('kpiCold',      cold);
+  set('kpiComplete',  complete);
+}
+
+function set(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = val;
+}
+
+// ─── WARM LEADS ──────────────────────────────────────────────────────────────
+function renderWarmLeads() {
+  const warm = contacts.filter(c => c.STATUS === 'CALL_TRIGGERED');
+  document.getElementById('warmCount').textContent = warm.length;
+  const body  = document.getElementById('warmBody');
+  const empty = document.getElementById('warmEmpty');
+
+  if (warm.length === 0) {
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  const items = warm.map(c => {
+    const triggerType = getTriggerType(c);
+    const lacrm = getLacrmLink(c);
+    return `
+    <div class="warm-item">
+      <div class="warm-info">
+        <div class="warm-name">${escHtml(getName(c))}</div>
+        <div class="warm-email">${escHtml(c.EMAIL || '')}</div>
+      </div>
+      <span class="warm-trigger ${triggerType.cls}">${triggerType.label}</span>
+      <div class="warm-meta">
+        <div>${escHtml(c.SEQUENCE || 'PP1')} · Step ${escHtml(c.STEP || '1')}</div>
+        <div style="margin-top:4px;">Opens: ${c.OPEN_COUNT||0} · Clicks: ${c.LP_CLICK_COUNT||0}</div>
+      </div>
+      ${lacrm ? `<a class="open-profile-btn" href="${lacrm}" target="_blank">↗ Open Profile</a>` : ''}
+    </div>`;
+  }).join('');
+
+  body.innerHTML = items + `<div id="warmEmpty" class="no-warm" style="display:none"></div>`;
+}
+
+function getTriggerType(c) {
+  if ((parseInt(c.VIDEO_CLICK) > 0) || c.VIDEO_CLICK === 'TRUE')
+    return { cls: 'trigger-video', label: '▶ Video Played' };
+  if (parseInt(c.LP_CLICK_COUNT) >= 2)
+    return { cls: 'trigger-lp',    label: '🔗 2× LP Click' };
+  if (parseInt(c.CLICK_COUNT) >= 2)
+    return { cls: 'trigger-cta',   label: '🎯 2× CTA Click' };
+  if (parseInt(c.OPEN_COUNT) >= 3)
+    return { cls: 'trigger-open',  label: '👁 3× Opens' };
+  return { cls: 'trigger-lp', label: 'Warm Lead' };
+}
+
+// LACRM contact link — pulled from events log if stored, else search by email
+function getLacrmLink(c) {
+  const ev = events.find(e => e.EMAIL === c.EMAIL && e.LACRM_ID);
+  if (ev && ev.LACRM_ID)
+    return `https://account.lessannoyingcrm.com/app/View_Contact?ContactId=${ev.LACRM_ID}`;
+  // Fallback: LACRM search by email
+  return `https://account.lessannoyingcrm.com/app/Search?q=${encodeURIComponent(c.EMAIL||'')}`;
+}
+
+function getName(c) {
+  const ev = events.find(e => e.EMAIL === c.EMAIL && e.FULL_NAME);
+  return ev ? ev.FULL_NAME : (c.EMAIL || '').split('@')[0];
+}
+
+function toggleWarm() {
+  const body    = document.getElementById('warmBody');
+  const chevron = document.getElementById('warmChevron');
+  body.classList.toggle('open');
+  chevron.classList.toggle('open');
+}
+
+// Auto-open warm panel if there are leads
+function autoOpenWarm() {
+  const warm = contacts.filter(c => c.STATUS === 'CALL_TRIGGERED');
+  if (warm.length > 0) {
+    document.getElementById('warmBody').classList.add('open');
+    document.getElementById('warmChevron').classList.add('open');
+  }
+}
+
+// ─── CONTACT TABLE ───────────────────────────────────────────────────────────
+function renderTable() {
+  const search  = (document.getElementById('searchInput').value || '').toLowerCase();
+  const status  = document.getElementById('statusFilter').value;
+  const seq     = document.getElementById('seqFilter').value;
+
+  let filtered = contacts.filter(c => {
+    if (search && !(c.EMAIL||'').toLowerCase().includes(search)) return false;
+    if (status && c.STATUS !== status) return false;
+    if (seq    && (c.SEQUENCE||'PP1') !== seq) return false;
+    return true;
+  });
+
+  document.getElementById('contactCount').textContent = filtered.length;
+
+  if (filtered.length === 0) {
+    document.getElementById('tableContainer').innerHTML =
+      '<div class="loading">No contacts match the filter.</div>';
+    return;
+  }
+
+  const rows = filtered.map(c => {
+    const seq  = c.SEQUENCE || 'PP1';
+    const stat = c.STATUS || 'ACTIVE';
+    const lacrm = getLacrmLink(c);
+    return `<tr>
+      <td class="email-cell">${escHtml(c.EMAIL||'')}</td>
+      <td><span class="seq-badge ${seq.toLowerCase()}">${escHtml(seq)}</span></td>
+      <td>${escHtml(c.STEP||'1')}</td>
+      <td>
+        <span class="status-dot ${statusDot(stat)}"></span>
+        ${escHtml(stat.replace('_',' '))}
+      </td>
+      <td>
+        <div class="stat-pills">
+          ${c.OPEN_COUNT     ? `<span class="pill pill-opens">👁 ${c.OPEN_COUNT}</span>` : ''}
+          ${c.CLICK_COUNT    ? `<span class="pill pill-clicks">🔗 ${c.CLICK_COUNT}</span>` : ''}
+          ${c.LP_CLICK_COUNT ? `<span class="pill pill-lp">LP ${c.LP_CLICK_COUNT}</span>` : ''}
+          ${(c.VIDEO_CLICK==='TRUE'||parseInt(c.VIDEO_CLICK)>0) ? `<span class="pill pill-video">▶</span>` : ''}
+        </div>
+      </td>
+      <td>${escHtml(c.NEXT_SEND_DATE||'')}</td>
+      <td>${lacrm ? `<a class="profile-link" href="${lacrm}" target="_blank">↗ LACRM</a>` : ''}</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('tableContainer').innerHTML = `
+    <table>
+      <thead>
+        <tr>
+          <th>Email</th><th>Sequence</th><th>Step</th><th>Status</th>
+          <th>Engagement</th><th>Next Send</th><th>Profile</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+
+function statusDot(s) {
+  const map = {
+    ACTIVE: 'dot-active', REBOUND_PENDING: 'dot-rebound',
+    CALL_TRIGGERED: 'dot-call', COLD_NURTURE: 'dot-cold',
+    COMPLETE: 'dot-complete', REMOVED: 'dot-removed'
+  };
+  return map[s] || 'dot-active';
+}
+
+// ─── EVENT LOG ───────────────────────────────────────────────────────────────
+function renderEvents() {
+  const recent = [...events]
+    .sort((a, b) => (b.TIMESTAMP||'').localeCompare(a.TIMESTAMP||''))
+    .slice(0, 50);
+
+  document.getElementById('eventCount').textContent = recent.length;
+
+  if (recent.length === 0) {
+    document.getElementById('eventContainer').innerHTML =
+      '<div class="no-warm">No events logged yet. Events appear here once the Dashboard Events tab is populated by N8N.</div>';
+    return;
+  }
+
+  const rows = recent.map(e => {
+    const ts   = e.TIMESTAMP ? new Date(e.TIMESTAMP).toLocaleString() : '';
+    const type = e.EVENT_TYPE || '';
+    const cls  = typeClass(type);
+    return `<div class="log-item">
+      <span class="log-time">${escHtml(ts.split(',')[1]?.trim() || ts)}</span>
+      <span class="log-type ${cls}">${escHtml(type.replace('_',' '))}</span>
+      <span class="log-email">${escHtml(e.EMAIL||'')}</span>
+      <span class="log-detail">${escHtml(e.DETAIL||'')} ${e.SEQUENCE ? `· ${e.SEQUENCE} Step ${e.STEP||''}` : ''}</span>
+    </div>`;
+  }).join('');
+
+  document.getElementById('eventContainer').innerHTML = rows;
+}
+
+function typeClass(t) {
+  const map = {
+    EMAIL_SENT:      'type-sent',
+    EMAIL_OPENED:    'type-open',
+    EMAIL_OPEN:      'type-open',
+    EMAIL_CLICK:     'type-click',
+    LP_VISIT:        'type-lp',
+    LP_VISITED:      'type-lp',
+    CTA_CLICK:       'type-cta',
+    VIDEO_PLAY:      'type-video',
+    VIDEO_PLAYED:    'type-video',
+    REBOUND_SENT:    'type-cta',
+    CALL_TRIGGERED:  'type-trigger',
+    BOOKED:          'type-trigger',
+    CALENDLY_BOOKED: 'type-trigger',
+    CALL_BOOKED:     'type-trigger',
+  };
+  return map[t] || 'type-sent';
+}
+
+// ─── UTILS ───────────────────────────────────────────────────────────────────
+function escHtml(s) {
+  return String(s||'')
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+loadAll().then(autoOpenWarm);
+
+// Auto-refresh every 5 minutes
+setInterval(loadAll, 5 * 60 * 1000);
+</script>
+</body>
+</html>
